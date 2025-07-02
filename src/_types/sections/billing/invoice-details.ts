@@ -1,0 +1,66 @@
+import { InvoiceItem } from 'src/_types/reality/invoice/invoiceData';
+import { PackageDataType } from 'src/_types/reality/package/packageData';
+import { UserData } from 'src/_types/reality/user/userData';
+
+export interface InvoiceDetailsProps {
+  organization: {
+    ID: number;
+    name: string;
+    industry: string;
+    company_size: number;
+    phone_number: string;
+    website: string;
+    company_logo: string;
+    user: null;
+    user_id: number;
+    products: null;
+    packages: PackageDataType[];
+    created_at: Date;
+    updated_at: Date;
+    deleted_at: number;
+    category: { title: string };
+    category_id: number;
+    company_name: string;
+    company_registration_number: string;
+    domain: string;
+    email: string;
+    individual_address: string;
+    is_individual: boolean;
+    legal_address: string;
+    national_code: string;
+    zip_code: string;
+  };
+  invoice: {
+    ID: number;
+    coupon_code: string;
+    created_at: Date;
+    custom_ref_id: string;
+    deleted_at: number;
+    due_date: null;
+    final_paid_amount: number;
+    from_address: string;
+    from_email: string;
+    from_name: string;
+    from_phone_number: string;
+    invoice_items: InvoiceItem[];
+    invoice_unique_code: string;
+    organization: null;
+    organization_id: number;
+    ref_id: string;
+    status: string;
+    suspended_at: null;
+    tax_amount: number;
+    to_address: string;
+    to_email: string;
+    to_name: string;
+    to_phone_number: string;
+    to_postal_code: string;
+    updated_at: Date;
+    user: UserData;
+    user_id: number;
+    economic_id: string;
+    from_postal_code: string;
+    register_number: string;
+    seller: string;
+  };
+}

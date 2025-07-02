@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  armo-nextjs-console:
+    container_name: armo-nextjs-console
+    restart: unless-stopped
+    expose:
+      - 8080
+    build: .
+    ports:
+      - '8080:8080'

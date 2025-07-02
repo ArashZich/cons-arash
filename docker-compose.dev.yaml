@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  armo-dev-nextjs-console:
+    container_name: armo-dev-nextjs-console
+    restart: unless-stopped
+    expose:
+      - 8080
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - '8080:8080'
