@@ -111,6 +111,7 @@ export const paths = {
     project_submitted: `${ROOTS.PROJECT}/project-submitted`,
     details: (uid: string) => `${ROOTS.PROJECT}/${uid}/details`,
     create_showroom: `${ROOTS.PROJECT}/create-showroom`,
+    regal_uploader: '/project/regal-uploader',
   }, //  FIXME: change this when you want change setting profile
   // setting
   setting: { root: ROOTS.SETTING },
