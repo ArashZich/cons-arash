@@ -200,6 +200,16 @@ export const contentMap: any = {
     'project.file_size_should_15mb',
     'project.glb_format_must_pbr',
   ],
+  // اضافه کردن رگال با راهنمای مخصوص خودش
+  regal: [
+    'project.regal_guide_1', // انتخاب اندازه رگال
+    'project.regal_guide_2', // آپلود تا 50 عکس
+    'project.regal_guide_3', // هر عکس حداکثر 1 مگابایت
+    'project.regal_guide_4', // عکس‌ها باید فرمت PNG یا JPG باشند
+    'project.regal_guide_5', // عکس‌ها بدون حاشیه اضافه
+    'project.regal_single_product_info', // توضیح یک محصول با چندین داکیومنت
+    'project.regal_auto_glb_usdz_generation', // تولید خودکار GLB و USDZ
+  ],
 };
 
 // Define the mapping outside your component
@@ -220,5 +230,6 @@ export const downloadUrls: any = {
   fashion: 'https://armogroup.storage.iran.liara.space/3D-model/fashion.glb',
   ar_3d: 'https://armogroup.storage.iran.liara.space/3D-model/gamification.glb',
   '3d': 'https://armogroup.storage.iran.liara.space/3D-model/gamification.glb',
+  // رگال نیازی به sample 3D model ندارد چون از عکس GLB می‌سازد
   // Add other categories as necessary
 };

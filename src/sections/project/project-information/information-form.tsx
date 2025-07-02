@@ -39,7 +39,7 @@ import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
 // utils
 import { projectHasImage, projectHasDimensions } from 'src/utils/project-guide';
-import { createProjectRouting } from 'src/utils/project-routing';
+import { createProjectInformationRouting } from 'src/utils/project-routing';
 // req-hooks
 import { useUploadFileMutation } from 'src/_req-hooks/bytebase/file/useUploadFileMutation';
 
@@ -115,7 +115,7 @@ function InformationForm() {
   const onSubmit = handleSubmit(async (values) => {
     dispatch(projectNameChanged(values.name));
     dispatch(projectImageChanged(values.thumbnail_uri));
-    router.push(createProjectRouting(categoryName));
+    router.push(createProjectInformationRouting(categoryName));
   });
 
   const handleBack = () => {

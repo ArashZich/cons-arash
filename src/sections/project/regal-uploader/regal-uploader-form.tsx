@@ -50,7 +50,7 @@ import {
 } from 'src/constants/project/regal-project';
 
 // req-hooks
-import { useCreateProductMultipleMutation } from 'src/_req-hooks/reality/product/useCreateProductMultipleMutation';
+import { useCreateProductMutation } from 'src/_req-hooks/reality/product/useCreateProductMutation'; // تغییر از Multiple به Single
 import { useUploadBatchImgToGlbUsdzMutation } from 'src/_req-hooks/bytebase/file/useUploadBatchImgToGlbUsdzMutation';
 
 // types
@@ -113,9 +113,8 @@ function RegalUploaderForm() {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
-  // Mutations
-  const { mutateAsync: createProductMultiple, isLoading: isCreatingProducts } =
-    useCreateProductMultipleMutation();
+  // Mutations - تغییر به single product mutation
+  const { mutateAsync: createProduct, isLoading: isCreatingProduct } = useCreateProductMutation();
   const {
     mutateAsync: uploadBatchImages,
     data: uploadData,
@@ -123,54 +122,55 @@ function RegalUploaderForm() {
     isSuccess: isUploadSuccess,
   } = useUploadBatchImgToGlbUsdzMutation();
 
-  // Process uploaded results into products
+  // Process uploaded results into single product with multiple documents
   const processUploadResults = (
     results: BatchUploadResultItem[],
     files: File[]
-  ): CreateProductRequestBodyType[] => {
-    return results.map((result, index) => {
+  ): CreateProductRequestBodyType => {
+    const documents = results.map((result, index) => {
       const file = files[index];
       const sizeInMB = file.size / (1024 * 1024);
 
       // Extract name from filename
       const nameMatch = result.glb.match(/@(.+?)-\d+x\d+\.glb/);
-      const name = nameMatch ? nameMatch[1] : `${projectName}_${index + 1}`;
+      const documentTitle = nameMatch ? nameMatch[1] : `${projectName}_${index + 1}`;
 
       return {
-        name,
-        thumbnail_uri: process.env.NEXT_PUBLIC_BYTEBASE_BASE_URL_DOWNLOAD + result.poster,
-        category_id: categoryId as number,
+        title: documentTitle,
+        file_uri: process.env.NEXT_PUBLIC_BYTEBASE_BASE_URL_DOWNLOAD + result.glb,
+        preview_uri: process.env.NEXT_PUBLIC_BYTEBASE_BASE_URL_DOWNLOAD + result.poster,
+        asset_uri: process.env.NEXT_PUBLIC_BYTEBASE_BASE_URL_DOWNLOAD + result.usdz,
+        phone_number: '',
+        cell_phone: '',
+        website: '',
+        telegram: '',
+        instagram: '',
+        linkedin: '',
+        location: '',
+        size: '',
+        order: index + 1, // ترتیب documents
+        size_mb: Math.ceil(sizeInMB),
         organization_id: organization?.ID as number,
-        documents: [
-          {
-            title: name,
-            file_uri: process.env.NEXT_PUBLIC_BYTEBASE_BASE_URL_DOWNLOAD + result.glb,
-            preview_uri: process.env.NEXT_PUBLIC_BYTEBASE_BASE_URL_DOWNLOAD + result.poster,
-            asset_uri: process.env.NEXT_PUBLIC_BYTEBASE_BASE_URL_DOWNLOAD + result.usdz,
-            phone_number: '',
-            cell_phone: '',
-            website: '',
-            telegram: '',
-            instagram: '',
-            linkedin: '',
-            location: '',
-            size: '',
-            order: 1,
-            size_mb: Math.ceil(sizeInMB),
-            organization_id: organization?.ID as number,
-          },
-        ],
-        disabled: false,
       };
     });
+
+    // یک product با multiple documents
+    return {
+      name: projectName,
+      thumbnail_uri: previewUri,
+      category_id: categoryId as number,
+      organization_id: organization?.ID as number,
+      documents,
+      disabled: false,
+    };
   };
 
   // Submit handler
   const onSubmit = handleSubmit(async (formValues) => {
     try {
       if (isUploadSuccess && uploadData?.data) {
-        const products = processUploadResults(uploadData.data, formValues.files);
-        await createProductMultiple(products);
+        const productData = processUploadResults(uploadData.data, formValues.files);
+        await createProduct(productData); // single product call
         router.push(paths.project.project_submitted);
       }
     } catch (error) {
@@ -328,7 +328,7 @@ function RegalUploaderForm() {
             sx={{ mt: 3 }}
             fullWidth
             title={t('organization.continue')}
-            loading={isCreatingProducts}
+            loading={isCreatingProduct} // تغییر نام متغیر
             disabled={!isUploadSuccess}
             type="submit"
           />

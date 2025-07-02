@@ -92,6 +92,7 @@ function ChooseCategoryInfo() {
 
     // ⭐️ استفاده از createProjectRouting برای تمام کتگوری‌ها
     const selectedCategory = categoryData?.data.items?.find((item) => item.ID === categoryId);
+
     if (selectedCategory) {
       const routePath = createProjectRouting(selectedCategory.title);
       router.push(routePath);

@@ -149,12 +149,22 @@ export default function ProjectDetails({ project }: ProjectDetailsProps) {
   const documentsLength = project?.documents?.length || 0;
 
   const carousel = useCarousel({
-    centerMode: documentsLength > 3, // Enable centerMode only if there are more than 3 documents
+    centerMode: false,
     swipeToSlide: true,
     focusOnSelect: true,
-    variableWidth: true,
-    centerPadding: documentsLength > 3 ? '20px' : '0px', // Add padding only if there are more than 3 documents
-    slidesToShow: documentsLength > 3 ? 3 : documentsLength || 1,
+    variableWidth: false,
+    centerPadding: '0px',
+    // ✅ منطق درست برای slidesToShow:
+    slidesToShow: (() => {
+      if (documentsLength === 1) return 1;
+      if (documentsLength === 2) return 2;
+      if (documentsLength === 3) return 3;
+      if (documentsLength >= 4) return 4;
+      return documentsLength;
+    })(),
+    slidesToScroll: 1,
+    infinite: documentsLength > 3, // ✅ فقط اگه بیشتر از 3 تا باشه infinite باشه
+    dots: documentsLength > 4, // ✅ اگه بیشتر از 4 تا باشه dots نشون بده
   });
 
   useEffect(() => {

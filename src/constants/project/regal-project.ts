@@ -8,6 +8,7 @@ export const project_image_regal = (t: any) => [
   t('project.regal_image_info_2'),
   t('project.regal_image_info_3'),
   t('project.regal_image_info_4'),
+  t('project.single_product_multiple_documents'), // اضافه کردن توضیح جدید
 ];
 
 // اضافه کردن رگال به contentMap موجود
@@ -17,10 +18,8 @@ export const regalContentMap = [
   'project.regal_guide_3',
   'project.regal_guide_4',
   'project.regal_guide_5',
+  'project.regal_single_product_info', // توضیح اینکه یک محصول با چندین داکیومنت ساخته می‌شود
 ];
-
-// اضافه کردن به contentMap اصلی:
-// contentMap.regal = regalContentMap;
 
 // رگال size options
 export const regal_size_options = (t: any) => [
