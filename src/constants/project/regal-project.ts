@@ -4,11 +4,11 @@ export const REGAL_MAX_SIZE_MB = 1; // 1MB per file
 
 // رگال info for upload component
 export const project_image_regal = (t: any) => [
-  t('project.regal_image_info_1'),
-  t('project.regal_image_info_2'),
-  t('project.regal_image_info_3'),
-  t('project.regal_image_info_4'),
-  t('project.single_product_multiple_documents'), // اضافه کردن توضیح جدید
+  { label: t('project.regal_image_info_1'), value: 1 },
+  { label: t('project.regal_image_info_2'), value: 2 },
+  { label: t('project.regal_image_info_3'), value: 3 },
+  { label: t('project.regal_image_info_4'), value: 4 },
+  // { label: t('project.single_product_multiple_documents'), value: 5 },
 ];
 
 // اضافه کردن رگال به contentMap موجود
@@ -23,8 +23,20 @@ export const regalContentMap = [
 
 // رگال size options
 export const regal_size_options = (t: any) => [
-  { label: t('project.regal_size_small'), value: '100,200' }, // 1x2 متر
-  { label: t('project.regal_size_medium'), value: '150,250' }, // 1.5x2.5 متر
-  { label: t('project.regal_size_large'), value: '200,300' }, // 2x3 متر
-  { label: t('project.regal_size_custom'), value: '0' }, // سفارشی
+  {
+    label: t('project.6m'),
+    value: '200,300',
+  },
+  {
+    label: t('project.9m'),
+    value: '250,350',
+  },
+  {
+    label: t('project.12m'),
+    value: '300,400',
+  },
+  {
+    label: t('project.other_size'),
+    value: '0',
+  },
 ];

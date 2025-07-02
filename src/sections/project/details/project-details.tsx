@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from 'react';
 // @mui
 import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Unstable_Grid2';
-import { Typography, Box, Avatar } from '@mui/material';
-import { styled, alpha } from '@mui/material/styles';
+import { Typography, Box, IconButton } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 // immer
 import { useImmer } from 'use-immer';
 
@@ -15,69 +15,16 @@ import { ProductData } from 'src/_types/reality/product/productData';
 
 // utils
 import { loadingImage } from 'src/utils/image-size';
-// theme
-import { bgGradient } from 'src/theme/css';
 // components
 import ModelViewer from 'src/components/model-viewer';
 import Iconify from 'src/components/iconify';
 import Image from 'src/components/image';
 import { useSnackbar } from 'src/components/snackbar';
 import { useBoolean } from 'src/hooks/use-boolean';
-import Carousel, { useCarousel, CarouselArrows } from 'src/components/carousel';
 
 //
 import ProjectInfo from './project-info';
 import ProjectDetailsInsightsDialog from './project-details-insights-dialog';
-
-// ----------------------------------------------------------------------
-
-const THUMB_SIZE = 64;
-
-const StyledThumbnailsContainer = styled('div')<{ length: number }>(({ length, theme }) => ({
-  position: 'relative',
-  margin: theme.spacing(0, 'auto'),
-  display: 'flex',
-  justifyContent: 'center',
-  '& .slick-slide': {
-    lineHeight: 0,
-  },
-
-  ...(length === 1 && {
-    maxWidth: THUMB_SIZE * 1 + 16,
-  }),
-
-  ...(length === 2 && {
-    maxWidth: THUMB_SIZE * 2 + 32,
-  }),
-
-  ...((length === 3 || length === 4) && {
-    maxWidth: THUMB_SIZE * 3 + 48,
-  }),
-
-  ...(length >= 5 && {
-    maxWidth: THUMB_SIZE * 6,
-  }),
-
-  ...(length > 3 && {
-    '&:before, &:after': {
-      ...bgGradient({
-        direction: 'to left',
-        startColor: `${alpha(theme.palette.background.default, 0)} 0%`,
-        endColor: `${theme.palette.background.default} 100%`,
-      }),
-      top: 0,
-      zIndex: 9,
-      content: "''",
-      height: '100%',
-      position: 'absolute',
-      width: (THUMB_SIZE * 2) / 3,
-    },
-    '&:after': {
-      right: 0,
-      transform: 'scaleX(-1)',
-    },
-  }),
-}));
 
 // ----------------------------------------------------------------------
 
@@ -91,7 +38,7 @@ type Dimensions = {
 };
 
 export default function ProjectDetails({ project }: ProjectDetailsProps) {
-  const { t } = useLocales();
+  const { t, isRtl } = useLocales();
   const toggle = useBoolean();
   const [productUid, setProductUid] = useState<string | null>(null);
   const [currentModelIndex, setCurrentModelIndex] = useState<number>(0);
@@ -148,97 +95,24 @@ export default function ProjectDetails({ project }: ProjectDetailsProps) {
 
   const documentsLength = project?.documents?.length || 0;
 
-  const carousel = useCarousel({
-    centerMode: false,
-    swipeToSlide: true,
-    focusOnSelect: true,
-    variableWidth: false,
-    centerPadding: '0px',
-    // ✅ منطق درست برای slidesToShow:
-    slidesToShow: (() => {
-      if (documentsLength === 1) return 1;
-      if (documentsLength === 2) return 2;
-      if (documentsLength === 3) return 3;
-      if (documentsLength >= 4) return 4;
-      return documentsLength;
-    })(),
-    slidesToScroll: 1,
-    infinite: documentsLength > 3, // ✅ فقط اگه بیشتر از 3 تا باشه infinite باشه
-    dots: documentsLength > 4, // ✅ اگه بیشتر از 4 تا باشه dots نشون بده
-  });
-
-  useEffect(() => {
-    carousel.onSetNav();
-  }, [carousel]);
-
   useEffect(() => {
     if (project?.documents && project.documents.length > 0) {
       setCurrentModelIndex(0); // Set default document to be displayed
     }
   }, [project]);
 
+  // Navigation functions
   const handleNext = () => {
-    if (project?.documents) {
-      carousel.onNext();
-      setCurrentModelIndex((prevIndex) => (prevIndex + 1) % project.documents.length);
+    if (project?.documents && documentsLength > 1) {
+      setCurrentModelIndex((prevIndex) => (prevIndex + 1) % documentsLength);
     }
   };
 
   const handlePrev = () => {
-    if (project?.documents) {
-      carousel.onPrev();
-      setCurrentModelIndex(
-        (prevIndex) => (prevIndex - 1 + project.documents.length) % project.documents.length
-      );
+    if (project?.documents && documentsLength > 1) {
+      setCurrentModelIndex((prevIndex) => (prevIndex - 1 + documentsLength) % documentsLength);
     }
   };
-
-  const renderThumbnails = (
-    <StyledThumbnailsContainer length={project?.documents?.length || 0}>
-      <CarouselArrows
-        onNext={handleNext}
-        onPrev={handlePrev}
-        leftButtonProps={{
-          sx: {
-            left: -50,
-          },
-        }}
-        rightButtonProps={{
-          sx: {
-            right: -50,
-          },
-        }}
-        filled
-        shape="rounded"
-      >
-        <Carousel
-          {...carousel.carouselSettings}
-          ref={carousel.carouselRef}
-          beforeChange={(oldIndex, newIndex) => setCurrentModelIndex(newIndex)}
-        >
-          {project?.documents.map((item, index) => (
-            <Box key={item.ID} sx={{ px: 0.5 }}>
-              <Avatar
-                variant="rounded"
-                alt={item.title}
-                src={item.preview_uri}
-                sx={{
-                  width: THUMB_SIZE,
-                  height: THUMB_SIZE,
-                  opacity: 0.48,
-                  cursor: 'pointer',
-                  ...(currentModelIndex === index && {
-                    opacity: 1,
-                    border: (theme) => `solid 2.5px ${theme.palette.primary.main}`,
-                  }),
-                }}
-              />
-            </Box>
-          ))}
-        </Carousel>
-      </CarouselArrows>
-    </StyledThumbnailsContainer>
-  );
 
   const renderMedia = () => {
     const fileType = project?.category.accepted_file_type;
@@ -265,9 +139,52 @@ export default function ProjectDetails({ project }: ProjectDetailsProps) {
         return <ModelViewer src={fileUri as string} height="100%" width="100%" />;
 
       default:
-        // Optionally handle other types or return null/undefined if not applicable
         return null;
     }
+  };
+
+  const renderNavigationButtons = () => {
+    if (!project?.documents || documentsLength <= 1) return null;
+
+    return (
+      <Stack direction="row" alignItems="center" justifyContent="center" spacing={2} sx={{ mt: 2 }}>
+        <IconButton
+          onClick={handlePrev}
+          sx={{
+            bgcolor: '#000',
+            color: 'white',
+            borderRadius: 1, // مربعی کردن
+            width: 32,
+            height: 32,
+            '&:hover': {
+              bgcolor: '#333',
+            },
+          }}
+        >
+          <Iconify icon={isRtl ? 'eva:arrow-ios-forward-fill' : 'eva:arrow-ios-back-fill'} />
+        </IconButton>
+
+        <Typography variant="body2" sx={{ minWidth: 60, textAlign: 'center' }}>
+          {currentModelIndex + 1} / {documentsLength}
+        </Typography>
+
+        <IconButton
+          onClick={handleNext}
+          sx={{
+            bgcolor: '#000',
+            color: 'white',
+            borderRadius: 1, // مربعی کردن
+            width: 32,
+            height: 32,
+            '&:hover': {
+              bgcolor: '#333',
+            },
+          }}
+        >
+          <Iconify icon={isRtl ? 'eva:arrow-ios-back-fill' : 'eva:arrow-ios-forward-fill'} />
+        </IconButton>
+      </Stack>
+    );
   };
 
   return (
@@ -282,6 +199,7 @@ export default function ProjectDetails({ project }: ProjectDetailsProps) {
       <Grid container width="100%" spacing={6} alignItems="center" justifyContent="center">
         <Grid sm={12} md={7} sx={{ height: { md: 650, xs: 400 } }}>
           {renderMedia()}
+
           {(project?.category.accepted_file_type === 'glb' ||
             project?.category.accepted_file_type === 'complex' ||
             project?.category.accepted_file_type === 'multi-images') && (
@@ -290,12 +208,11 @@ export default function ProjectDetails({ project }: ProjectDetailsProps) {
               <Typography variant="button">{t('project.drag_rotate')}</Typography>
             </Stack>
           )}
-          {project?.documents && project.documents.length > 1 && (
-            <Grid xs={12} sx={{ mt: 3 }}>
-              {renderThumbnails}
-            </Grid>
-          )}
+
+          {/* Navigation Buttons */}
+          {renderNavigationButtons()}
         </Grid>
+
         <Grid xs={12} md={5} sx={{ pb: 6 }} alignItems="center" justifyContent="center">
           <Stack
             width="100%"
