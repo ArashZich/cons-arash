@@ -10,7 +10,7 @@ import * as Yup from 'yup';
 // @mui
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 
 // redux
 import { useSelector } from 'src/redux/store';
@@ -36,7 +36,6 @@ import { BackButton, LoadingButton } from 'src/components/button';
 import { useSnackbar } from 'src/components/snackbar';
 import CircleProgress from 'src/components/modal-progress/circular-progress';
 import CustomList from 'src/components/custom-list-info/custom-list';
-import Iconify from 'src/components/iconify';
 
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
@@ -47,10 +46,12 @@ import {
   REGAL_MAX_SIZE_MB,
   project_image_regal,
   regal_size_options,
+  regal_circle_size_options,
+  regal_shape_options,
 } from 'src/constants/project/regal-project';
 
 // req-hooks
-import { useCreateProductMutation } from 'src/_req-hooks/reality/product/useCreateProductMutation'; // تغییر از Multiple به Single
+import { useCreateProductMutation } from 'src/_req-hooks/reality/product/useCreateProductMutation';
 import { useUploadBatchImgToGlbUsdzMutation } from 'src/_req-hooks/bytebase/file/useUploadBatchImgToGlbUsdzMutation';
 
 // types
@@ -65,6 +66,7 @@ interface FormValues {
   files: File[];
   width: string;
   length: string;
+  isCircle: boolean;
 }
 
 const defaultValues: FormValues = {
@@ -72,6 +74,7 @@ const defaultValues: FormValues = {
   files: [],
   width: '',
   length: '',
+  isCircle: false,
 };
 
 function RegalUploaderForm() {
@@ -89,9 +92,10 @@ function RegalUploaderForm() {
         width: Yup.string().when('size', ([size], schema) => {
           return size === '0' ? schema.required(t('project.regal_width')) : schema;
         }),
-        length: Yup.string().when('size', ([size], schema) => {
-          return size === '0' ? schema.required(t('project.regal_length')) : schema;
+        length: Yup.string().when(['size', 'isCircle'], ([size, isCircle], schema) => {
+          return size === '0' && !isCircle ? schema.required(t('project.regal_length')) : schema;
         }),
+        isCircle: Yup.boolean(),
       }),
     [t]
   );
@@ -113,7 +117,7 @@ function RegalUploaderForm() {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
-  // Mutations - تغییر به single product mutation
+  // Mutations
   const { mutateAsync: createProduct, isLoading: isCreatingProduct } = useCreateProductMutation();
   const {
     mutateAsync: uploadBatchImages,
@@ -148,13 +152,12 @@ function RegalUploaderForm() {
         linkedin: '',
         location: '',
         size: '',
-        order: index + 1, // ترتیب documents
+        order: index + 1,
         size_mb: Math.ceil(sizeInMB),
         organization_id: organization?.ID as number,
       };
     });
 
-    // یک product با multiple documents
     return {
       name: projectName,
       thumbnail_uri: previewUri,
@@ -170,7 +173,7 @@ function RegalUploaderForm() {
     try {
       if (isUploadSuccess && uploadData?.data) {
         const productData = processUploadResults(uploadData.data, formValues.files);
-        await createProduct(productData); // single product call
+        await createProduct(productData);
         router.push(paths.project.project_submitted);
       }
     } catch (error) {
@@ -223,18 +226,18 @@ function RegalUploaderForm() {
 
       if (values.size === '0') {
         width = values.width;
-        length = values.length;
+        length = values.isCircle ? values.width : values.length; // For circle, length = width (diameter)
       } else {
         const sizeList = values.size.split(',');
         width = sizeList[0];
-        length = sizeList[1];
+        length = sizeList[1] || sizeList[0]; // For circle predefined sizes
       }
 
       await uploadBatchImages({
         files: values.files,
         width,
         length,
-        isCircle: false,
+        isCircle: values.isCircle,
         isTile: false,
         isWall: false,
       });
@@ -265,12 +268,35 @@ function RegalUploaderForm() {
           {t('project.regal_upload_description')}
         </Typography>
 
-        <Stack mt={3} alignItems="center" maxWidth="sm">
+        {/* Shape Selection */}
+        <Stack mt={2} mb={2}>
+          <Typography color="text.disabled" variant="body2">
+            {t('project.regal_choose_shape')}
+          </Typography>
+
+          <RHFRadioGroup
+            row
+            name="isCircle"
+            options={regal_shape_options(t)}
+            onChange={(e) => {
+              const isCircleValue = e.target.value === 'true';
+              setValue('isCircle', isCircleValue, { shouldValidate: true });
+              // Reset size when shape changes
+              setValue('size', '', { shouldValidate: true });
+            }}
+          />
+          <Divider />
+        </Stack>
+
+        <Stack mt={1} alignItems="center" maxWidth="sm">
           <Typography color="text.disabled" variant="body2">
             {t('project.regal_choose_size')}
           </Typography>
 
-          <RHFRadioGroup name="size" options={regal_size_options(t)} />
+          <RHFRadioGroup
+            name="size"
+            options={values.isCircle ? regal_circle_size_options(t) : regal_size_options(t)}
+          />
 
           {values.size === '0' && (
             <Stack p={2} spacing={1} flexDirection="row" alignItems="center">
@@ -279,18 +305,38 @@ function RegalUploaderForm() {
                 sx={{ width: 120 }}
                 size="small"
                 name="width"
-                label={t('project.regal_width')}
+                label={values.isCircle ? t('project.diameter') : t('project.length')}
                 InputProps={{ inputProps: { min: 0 } }}
+                onChange={(e) => {
+                  const { value } = e.target;
+                  setValue('width', value === '' ? '' : value, { shouldValidate: true });
+                }}
               />
-              <Typography>x</Typography>
-              <RHFTextField
-                type="tel"
-                sx={{ width: 120 }}
-                size="small"
-                name="length"
-                label={t('project.regal_length')}
-                InputProps={{ inputProps: { min: 0 } }}
-              />
+              {!values.isCircle && (
+                <>
+                  <Typography>x</Typography>
+                  <RHFTextField
+                    type="tel"
+                    sx={{ width: 120 }}
+                    size="small"
+                    name="length"
+                    disabled={values.isCircle}
+                    label={t('project.width')}
+                    InputProps={{ inputProps: { min: 0 } }}
+                    onChange={(e) => {
+                      const { value } = e.target;
+                      setValue('length', value === '' ? '' : value, { shouldValidate: true });
+                    }}
+                  />
+                  <Typography>=</Typography>
+                  {values.width && values.length && (
+                    <Typography>
+                      {parseInt(values.width, 10) * parseInt(values.length, 10)}
+                      {t('project.cm')}
+                    </Typography>
+                  )}
+                </>
+              )}
             </Stack>
           )}
 
@@ -328,7 +374,7 @@ function RegalUploaderForm() {
             sx={{ mt: 3 }}
             fullWidth
             title={t('organization.continue')}
-            loading={isCreatingProduct} // تغییر نام متغیر
+            loading={isCreatingProduct}
             disabled={!isUploadSuccess}
             type="submit"
           />

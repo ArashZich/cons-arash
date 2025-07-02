@@ -14,6 +14,7 @@ function projectHasImage(category: string): boolean {
     case 'necklace':
     case 'earrings':
     case 'bow_tie':
+    case 'regal':
       return true;
 
     default:

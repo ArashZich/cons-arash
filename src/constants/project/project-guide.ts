@@ -202,13 +202,15 @@ export const contentMap: any = {
   ],
   // اضافه کردن رگال با راهنمای مخصوص خودش
   regal: [
-    'project.regal_guide_1', // انتخاب اندازه رگال
-    'project.regal_guide_2', // آپلود تا 50 عکس
-    'project.regal_guide_3', // هر عکس حداکثر 1 مگابایت
-    'project.regal_guide_4', // عکس‌ها باید فرمت PNG یا JPG باشند
-    'project.regal_guide_5', // عکس‌ها بدون حاشیه اضافه
+    'project.regal_guide_1', // انتخاب شکل رگال (مستطیل یا دایره)
+    'project.regal_guide_2', // انتخاب اندازه رگال
+    'project.regal_guide_3', // آپلود تا 50 عکس
+    'project.regal_guide_4', // هر عکس حداکثر 1 مگابایت
+    'project.regal_guide_5', // عکس‌ها باید فرمت PNG یا JPG باشند
+    'project.regal_guide_6', // عکس‌ها بدون حاشیه اضافه
     'project.regal_single_product_info', // توضیح یک محصول با چندین داکیومنت
-    'project.regal_auto_glb_usdz_generation', // تولید خودکار GLB و USDZ
+    'project.regal_circle_shape_info', // توضیح برای شکل دایره‌ای
+    'project.regal_rectangle_shape_info', // توضیح برای شکل مستطیلی
   ],
 };
 
