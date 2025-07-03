@@ -9,13 +9,13 @@ import Container from '@mui/material/Container';
 import { useSettingsContext } from 'src/components/settings';
 
 // form
-import ShowroomUploader from '../showroom-uploader';
+import EnhancedShowroomUploader from '../enhanced-showroom-uploader';
 
 function CreateShowroomView() {
   const settings = useSettingsContext();
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'} sx={{ height: '100%' }}>
-      <ShowroomUploader />
+      <EnhancedShowroomUploader />
     </Container>
   );
 }
