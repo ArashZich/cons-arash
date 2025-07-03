@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 // react
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 // @mui
 import Stack from '@mui/material/Stack';
@@ -21,7 +21,6 @@ import { useImmer } from 'use-immer';
 // redux
 import { useSelector } from 'src/redux/store';
 import {
-  acceptedFileTypeSelector,
   projectNameSelector,
   projectImageSelector,
   projectCategoryIdSelector,
@@ -38,7 +37,6 @@ import { useLocales } from 'src/locales';
 // components
 import { BackButton, LoadingButton } from 'src/components/button';
 import { useSnackbar } from 'src/components/snackbar';
-import CircleProgress from 'src/components/modal-progress/circular-progress';
 import CustomList from 'src/components/custom-list-info/custom-list';
 import Iconify from 'src/components/iconify';
 import { Upload } from 'src/components/upload';
@@ -50,10 +48,6 @@ import { project_3d_info, project_image_info } from 'src/constants/project';
 import { useCreateProductMutation } from 'src/_req-hooks/reality/product/useCreateProductMutation';
 import { useUploadFileMutation } from 'src/_req-hooks/bytebase/file/useUploadFileMutation';
 import { useUploadGlbToUsdzMutation } from 'src/_req-hooks/bytebase/file/useUploadGlbToUsdzMutation';
-
-// utils
-import { determineUploadSize } from 'src/utils/determine-upload-size';
-import { getAcceptedFileTypes } from 'src/utils/get-accepted-file-types';
 
 // Types
 interface FileWithPreview extends File {
@@ -120,30 +114,53 @@ const PairCard = styled(Card)(({ theme }) => ({
   },
 }));
 
+// Constants
+const IMAGE_MEGABYTE = 1048576; // 1MB
+const MODEL_MAX_SIZE = 15 * 1048576; // 15MB
+const MAX_PAIRS = 10;
+
 // Utility Functions
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-const getFileNameWithoutExtension = (fileName: string): string => {
-  return fileName.replace(/\.[^/.]+$/, '');
+const getFileNameWithoutExtension = (fileName: string): string => fileName.replace(/\.[^/.]+$/, '');
+
+const isImageFile = (file: File): boolean => file.type.startsWith('image/');
+
+const isModelFile = (file: File): boolean => file.name.toLowerCase().endsWith('.glb');
+
+const validateFileSize = (file: File, t: any): { isValid: boolean; error?: string } => {
+  if (isImageFile(file)) {
+    if (file.size > IMAGE_MEGABYTE) {
+      return { isValid: false, error: t('project.image_size_error') };
+    }
+  } else if (isModelFile(file)) {
+    if (file.size > MODEL_MAX_SIZE) {
+      return { isValid: false, error: t('project.model_size_error') };
+    }
+  }
+  return { isValid: true };
 };
 
-const isImageFile = (file: File): boolean => {
-  return file.type.startsWith('image/');
-};
-
-const isModelFile = (file: File): boolean => {
-  return file.name.toLowerCase().endsWith('.glb');
-};
-
-const autoPairFiles = (files: FileWithPreview[]): FilePair[] => {
+const autoPairFiles = (files: FileWithPreview[], existingPairs: FilePair[] = []): FilePair[] => {
   const images = files.filter(isImageFile);
   const models = files.filter(isModelFile);
-  const pairs: FilePair[] = [];
 
-  // Create pairs based on filename matching
-  images.forEach((image) => {
+  // Start with existing pairs
+  const pairs: FilePair[] = [...existingPairs];
+
+  // Find new files that aren't already in pairs
+  const existingFileNames = new Set([
+    ...existingPairs.map((p) => p.image?.name).filter(Boolean),
+    ...existingPairs.map((p) => p.model?.name).filter(Boolean),
+  ]);
+
+  const newImages = images.filter((img) => !existingFileNames.has(img.name));
+  const newModels = models.filter((model) => !existingFileNames.has(model.name));
+
+  // Create pairs for new images
+  newImages.forEach((image) => {
     const imageName = getFileNameWithoutExtension(image.name);
-    const matchingModel = models.find(
+    const matchingModel = newModels.find(
       (model) => getFileNameWithoutExtension(model.name) === imageName
     );
 
@@ -155,8 +172,8 @@ const autoPairFiles = (files: FileWithPreview[]): FilePair[] => {
     });
   });
 
-  // Add unpaired models
-  models.forEach((model) => {
+  // Add unpaired new models
+  newModels.forEach((model) => {
     const modelName = getFileNameWithoutExtension(model.name);
     const alreadyPaired = pairs.some(
       (pair) => pair.model && getFileNameWithoutExtension(pair.model.name) === modelName
@@ -172,11 +189,31 @@ const autoPairFiles = (files: FileWithPreview[]): FilePair[] => {
     }
   });
 
+  // Try to match unpaired files with existing incomplete pairs
+  pairs.forEach((pair) => {
+    if (!pair.image && pair.model) {
+      const modelName = getFileNameWithoutExtension(pair.model.name);
+      const matchingImage = newImages.find(
+        (img) => getFileNameWithoutExtension(img.name) === modelName
+      );
+      if (matchingImage) {
+        pair.image = matchingImage;
+      }
+    }
+
+    if (!pair.model && pair.image) {
+      const imageName = getFileNameWithoutExtension(pair.image.name);
+      const matchingModel = newModels.find(
+        (model) => getFileNameWithoutExtension(model.name) === imageName
+      );
+      if (matchingModel) {
+        pair.model = matchingModel;
+      }
+    }
+  });
+
   return pairs;
 };
-
-const IMAGE_MEGABYTE = 1048576;
-const MAX_PAIRS = 10;
 
 function EnhancedShowroomUploader() {
   const { t } = useLocales();
@@ -188,7 +225,6 @@ function EnhancedShowroomUploader() {
   const organization = useSelector(organizationSelector);
   const projectName = useSelector(projectNameSelector);
   const previewUri = useSelector(projectImageSelector);
-  const acceptedFileType = useSelector(acceptedFileTypeSelector);
   const categoryId = useSelector(projectCategoryIdSelector);
 
   // State
@@ -221,12 +257,81 @@ function EnhancedShowroomUploader() {
     [completedPairs.length, isLoading]
   );
 
+  // Helper function برای تشخیص فایل‌های واقعاً جدید - داخل component
+  // const isPairTrulyPending = useCallback((pair: FilePair): boolean => {
+  //   return (
+  //     pair.status === 'pending' &&
+  //     pair.image !== null &&
+  //     pair.model !== null &&
+  //     !pair.imageUrl &&
+  //     !pair.modelUrl &&
+  //     !pair.usdzUrl
+  //   );
+  // }, []);
+
+  const isPairTrulyPending = useCallback(
+    (pair: FilePair): boolean =>
+      pair.status === 'pending' &&
+      pair.image !== null &&
+      pair.model !== null &&
+      !pair.imageUrl &&
+      !pair.modelUrl &&
+      !pair.usdzUrl,
+    []
+  );
+
+  // تعداد فایل‌های جدید که هنوز اپلود نشدن
+  const newPairsCount = useMemo(
+    () => state.pairs.filter(isPairTrulyPending).length,
+    [state.pairs, isPairTrulyPending]
+  );
+
+  // File validation and drop handler
+  const handleDropRejected = useCallback(
+    (rejectedFiles: any[]) => {
+      rejectedFiles.forEach((fileRejection) => {
+        const { file, errors } = fileRejection;
+        errors.forEach((error: any) => {
+          if (error.code === 'file-too-large') {
+            enqueueSnackbar(
+              `${t('project.file')} ${file.name}: ${
+                isImageFile(file) ? t('project.image_size_limit') : t('project.model_size_limit')
+              }`,
+              { variant: 'error' }
+            );
+          }
+        });
+      });
+    },
+    [enqueueSnackbar, t]
+  );
+
   // File upload handler
   const handleDropMultipleFiles = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length === 0) return;
 
-      const filesWithPreview = acceptedFiles.map((file) =>
+      // Validate file sizes
+      const invalidFiles: string[] = [];
+      const validFiles = acceptedFiles.filter((file) => {
+        const validation = validateFileSize(file, t);
+        if (!validation.isValid) {
+          invalidFiles.push(`${file.name}: ${validation.error}`);
+          return false;
+        }
+        return true;
+      });
+
+      // Show errors for invalid files
+      if (invalidFiles.length > 0) {
+        invalidFiles.forEach((error) => {
+          enqueueSnackbar(error, { variant: 'error' });
+        });
+      }
+
+      if (validFiles.length === 0) return;
+
+      const filesWithPreview = validFiles.map((file) =>
         Object.assign(file, {
           preview: URL.createObjectURL(file),
         })
@@ -234,7 +339,8 @@ function EnhancedShowroomUploader() {
 
       setState((draft) => {
         draft.allFiles = [...draft.allFiles, ...filesWithPreview];
-        const newPairs = autoPairFiles([...draft.allFiles]);
+        // Pass existing pairs to preserve their status
+        const newPairs = autoPairFiles([...draft.allFiles], draft.pairs);
 
         if (newPairs.length > MAX_PAIRS) {
           enqueueSnackbar(t('project.upload_limit_exceeded'), { variant: 'error' });
@@ -247,30 +353,20 @@ function EnhancedShowroomUploader() {
     [setState, enqueueSnackbar, t]
   );
 
-  // Manual pairing handlers
-  const handleManualPair = useCallback(
-    (pairId: string, files: FileWithPreview[]) => {
-      setState((draft) => {
-        const pairIndex = draft.pairs.findIndex((p) => p.id === pairId);
-        if (pairIndex === -1) return;
-
-        const images = files.filter(isImageFile);
-        const models = files.filter(isModelFile);
-
-        if (images.length > 0) {
-          draft.pairs[pairIndex].image = images[0];
-        }
-        if (models.length > 0) {
-          draft.pairs[pairIndex].model = models[0];
-        }
-      });
-    },
-    [setState]
-  );
-
   const handleRemovePair = useCallback(
     (pairId: string) => {
       setState((draft) => {
+        const pairToRemove = draft.pairs.find((p) => p.id === pairId);
+        if (pairToRemove) {
+          // Remove files from allFiles array
+          if (pairToRemove.image) {
+            draft.allFiles = draft.allFiles.filter((f) => f.name !== pairToRemove.image!.name);
+          }
+          if (pairToRemove.model) {
+            draft.allFiles = draft.allFiles.filter((f) => f.name !== pairToRemove.model!.name);
+          }
+        }
+        // Remove pair
         draft.pairs = draft.pairs.filter((p) => p.id !== pairId);
       });
     },
@@ -282,6 +378,11 @@ function EnhancedShowroomUploader() {
     async (pair: FilePair): Promise<void> => {
       if (!pair.image || !pair.model) {
         throw new Error(t('project.upload_both_files'));
+      }
+
+      // Check if already uploaded
+      if (pair.status === 'completed') {
+        return;
       }
 
       setState((draft) => {
@@ -326,7 +427,7 @@ function EnhancedShowroomUploader() {
     [uploadFile, uploadGlbToUsdz, setState, t]
   );
 
-  // Upload all pairs
+  // Upload all pairs - برگشت به روش قبلی (sequential)
   const handleUploadAll = useCallback(async () => {
     const pendingPairs = state.pairs.filter(
       (pair) => pair.status === 'pending' && pair.image && pair.model
@@ -343,12 +444,19 @@ function EnhancedShowroomUploader() {
     });
 
     try {
+      // برگشت به روش sequential برای جلوگیری از فشار زیاد به سرور
       for (let i = 0; i < pendingPairs.length; i++) {
+        // eslint-disable-next-line no-await-in-loop
         await uploadPair(pendingPairs[i]);
 
         setState((draft) => {
           draft.uploadProgress = ((i + 1) / pendingPairs.length) * 100;
         });
+
+        if (i < pendingPairs.length - 1) {
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
       }
 
       enqueueSnackbar(t('project.upload_completed'), { variant: 'success' });
@@ -475,6 +583,10 @@ function EnhancedShowroomUploader() {
                   <Typography variant="body2" noWrap>
                     {pair.image.name}
                   </Typography>
+                  <Typography variant="caption" color="text.disabled">
+                    ({Math.round(pair.image.size / 1024)}
+                    {t('project.kb')})
+                  </Typography>
                 </Stack>
               ) : (
                 <Typography variant="body2" color="warning.main">
@@ -492,6 +604,10 @@ function EnhancedShowroomUploader() {
                   <Iconify icon="eva:cube-fill" color="success.main" />
                   <Typography variant="body2" noWrap>
                     {pair.model.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.disabled">
+                    ({Math.round(pair.model.size / (1024 * 1024))}
+                    {t('project.mb')})
                   </Typography>
                 </Stack>
               ) : (
@@ -547,13 +663,16 @@ function EnhancedShowroomUploader() {
   return (
     <Box maxWidth="lg">
       <Stack alignItems="center" spacing={3}>
-        <Stack alignItems="center" spacing={1}>
+        <Stack alignItems="center" maxWidth="md" spacing={1}>
           <Typography variant="h5">{t('project.upload_file')}</Typography>
           <Typography color="text.disabled" variant="body2" align="center">
             {t('project.showroom_description')}
           </Typography>
           <Typography color="text.disabled" variant="body2" align="center">
             {t('project.bulk_upload_description')}
+          </Typography>
+          <Typography color="text.disabled" variant="caption" align="center">
+            {t('project.file_size_limits')}
           </Typography>
         </Stack>
 
@@ -562,6 +681,8 @@ function EnhancedShowroomUploader() {
           <Upload
             multiple
             onDrop={handleDropMultipleFiles}
+            onDropRejected={handleDropRejected}
+            maxSize={MODEL_MAX_SIZE} // Maximum size for validation
             sx={{ border: 'none', backgroundColor: 'transparent' }}
             accept={{
               'image/*': [],
@@ -574,11 +695,15 @@ function EnhancedShowroomUploader() {
                 <Stack direction="row" spacing={4}>
                   <Stack alignItems="center">
                     <Iconify icon="eva:image-outline" width={24} />
-                    <Typography variant="caption">{t('project.images')}</Typography>
+                    <Typography variant="caption">
+                      {t('project.images')} ({t('project.max_1mb')})
+                    </Typography>
                   </Stack>
                   <Stack alignItems="center">
                     <Iconify icon="eva:cube-outline" width={24} />
-                    <Typography variant="caption">{t('project.models')}</Typography>
+                    <Typography variant="caption">
+                      {t('project.models')} ({t('project.max_15mb')})
+                    </Typography>
                   </Stack>
                 </Stack>
                 <CustomList list={[...project_image_info(t), ...project_3d_info(t)]} />
@@ -612,7 +737,8 @@ function EnhancedShowroomUploader() {
                   onClick={handleUploadAll}
                   disabled={
                     isLoading ||
-                    state.pairs.every((p) => p.status !== 'pending' || !p.image || !p.model)
+                    // استفاده از memoized value برای تشخیص فایل‌های جدید
+                    newPairsCount === 0
                   }
                 >
                   {t('project.upload_all')}

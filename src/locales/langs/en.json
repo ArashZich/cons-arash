@@ -501,7 +501,18 @@
     "naming_tip": "Naming Tip",
     "upload_both_files_same_name": "Upload image and model with the same filename (e.g., product1.jpg + product1.glb)",
     "upload_model_with_name": "Upload a GLB model with this name",
-    "upload_image_with_name": "Upload an image with this name"
+    "upload_image_with_name": "Upload an image with this name",
+    "image_size_error": "Image should not exceed 1 megabyte",
+    "model_size_error": "3D file should not exceed 15 megabytes",
+    "file": "File",
+    "image_size_limit": "Image should not exceed 1MB",
+    "model_size_limit": "3D file should not exceed 15MB",
+    "file_size_limits": "Maximum size: Images 1MB, 3D files 15MB",
+    "max_1mb": "max 1MB",
+    "max_15mb": "max 15MB",
+    "kb": "KB",
+    "mb": "MB",
+    "no_new_files_to_upload": "No new files to upload"
   },
   "category_management": {
     "new_category": "New Category",

@@ -16,6 +16,7 @@ export const createProjectInformationRouting = (category: string) => {
   switch (category) {
     case 'ar_3d':
     case '3d':
+    case 'vitrine':
       return paths.project.create_showroom;
     case 'regal':
       return paths.project.regal_uploader;

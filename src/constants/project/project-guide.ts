@@ -212,6 +212,17 @@ export const contentMap: any = {
     'project.regal_circle_shape_info', // توضیح برای شکل دایره‌ای
     'project.regal_rectangle_shape_info', // توضیح برای شکل مستطیلی
   ],
+  vitrine: [
+    'project.showroom_guideline1',
+    'project.showroom_guideline2',
+    'project.showroom_guideline3',
+    'project.showroom_guideline4',
+    'project.showroom_guideline5',
+    'project.size_each_photo_must_1mb',
+    'project.file_must_glb_format',
+    'project.file_size_should_15mb',
+    'project.glb_format_must_pbr',
+  ],
 };
 
 // Define the mapping outside your component

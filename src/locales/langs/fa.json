@@ -482,6 +482,7 @@
     "drop_files_here": "فایل‌هایتان را اینجا بکشید یا کلیک کنید",
     "images": "تصاویر",
     "models": "مدل‌های سه‌بعدی",
+    "file_pairs": "فایل‌های همنام",
     "file_groups": "گروه فایل‌ها",
     "upload_all": "آپلود همه",
     "unnamed_group": "گروه بدون نام",
@@ -501,7 +502,18 @@
     "naming_tip": "نکته نام‌گذاری",
     "upload_both_files_same_name": "عکس و مدل را با نام یکسان آپلود کنید (مثل: product1.jpg + product1.glb)",
     "upload_model_with_name": "مدل GLB با این نام آپلود کنید",
-    "upload_image_with_name": "عکس با این نام آپلود کنید"
+    "upload_image_with_name": "عکس با این نام آپلود کنید",
+    "image_size_error": "تصویر نباید بیشتر از 1 مگابایت باشد",
+    "model_size_error": "فایل 3D نباید بیشتر از 15 مگابایت باشد",
+    "file": "فایل",
+    "image_size_limit": "تصویر نباید بیشتر از 1MB باشد",
+    "model_size_limit": "فایل 3D نباید بیشتر از 15MB باشد",
+    "file_size_limits": "حداکثر اندازه: تصاویر 1MB، فایل‌های ۳بعدی 15MB",
+    "max_1mb": "حداکثر 1MB",
+    "max_15mb": "حداکثر 15MB",
+    "kb": "کیلوبایت",
+    "mb": "مگابایت",
+    "no_new_files_to_upload": "فایل جدیدی برای اپلود وجود ندارد"
   },
   "category_management": {
     "new_category": "دسته‌بندی جدید",
