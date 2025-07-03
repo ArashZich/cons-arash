@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-nested-ternary */
 // react
 import { useCallback, useEffect, useMemo } from 'react';
@@ -36,9 +37,6 @@ import { BackButton, LoadingButton } from 'src/components/button';
 import { useSnackbar } from 'src/components/snackbar';
 import CircleProgress from 'src/components/modal-progress/circular-progress';
 import CustomList from 'src/components/custom-list-info/custom-list';
-
-// hooks
-import { useBoolean } from 'src/hooks/use-boolean';
 
 // constants
 import {
@@ -79,29 +77,28 @@ const defaultValues: FormValues = {
 
 function RegalUploaderForm() {
   const { t } = useLocales();
-  const view = useBoolean();
 
   // Validation Schema
-  const schema = useMemo(
+  const validationSchema = useMemo(
     () =>
       Yup.object().shape({
         size: Yup.string().required(t('project.regal_size_required')),
         files: Yup.array()
           .min(1, t('project.regal_files_required'))
           .max(REGAL_MAX_FILES, t('project.regal_max_files_error')),
-        width: Yup.string().when('size', ([size], schema) => {
-          return size === '0' ? schema.required(t('project.regal_width')) : schema;
-        }),
-        length: Yup.string().when(['size', 'isCircle'], ([size, isCircle], schema) => {
-          return size === '0' && !isCircle ? schema.required(t('project.regal_length')) : schema;
-        }),
+        width: Yup.string().when('size', ([size], innerSchema) =>
+          size === '0' ? innerSchema.required(t('project.regal_width')) : innerSchema
+        ),
+        length: Yup.string().when(['size', 'isCircle'], ([size, isCircle], innerSchema) =>
+          size === '0' && !isCircle ? innerSchema.required(t('project.regal_length')) : innerSchema
+        ),
         isCircle: Yup.boolean(),
       }),
     [t]
   );
 
   const methods = useForm<FormValues>({
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(validationSchema) as any,
     defaultValues,
   });
 
@@ -228,6 +225,7 @@ function RegalUploaderForm() {
         width = values.width;
         length = values.isCircle ? values.width : values.length; // For circle, length = width (diameter)
       } else {
+        // Fixed ESLint prefer-destructuring warning
         const sizeList = values.size.split(',');
         width = sizeList[0];
         length = sizeList[1] || sizeList[0]; // For circle predefined sizes
@@ -279,8 +277,8 @@ function RegalUploaderForm() {
             name="isCircle"
             options={regal_shape_options(t)}
             onChange={(e) => {
-              const isCircleValue = e.target.value === 'true';
-              setValue('isCircle', isCircleValue, { shouldValidate: true });
+              const { value } = e.target;
+              setValue('isCircle', value === 'true', { shouldValidate: true });
               // Reset size when shape changes
               setValue('size', '', { shouldValidate: true });
             }}

@@ -17,7 +17,6 @@ import { usePackagesQuery } from 'src/_req-hooks/reality/package/usePackagesQuer
 import { useCategoriesQuery } from 'src/_req-hooks/reality/category/useCategoriesQuery';
 // utils
 import { calculateRemainingDays } from 'src/utils/calculate-remaining-days';
-import { createProjectRouting } from 'src/utils/project-routing'; // ⭐️ اضافه کردن
 // types
 import { FilterOperatorsEnum } from 'src/_types/site/filters';
 import { CategoryData } from 'src/_types/reality/category/categoryData';
@@ -85,24 +84,22 @@ function ChooseCategoryInfo() {
   );
 
   const handleContinue = () => {
+    const selectedCategory = categoryData?.data.items?.find((item) => item.ID === categoryId);
+
     if (remainingDays === 0) {
       enqueueSnackbar(t('project.expire_date_package'), { variant: 'warning' });
       return;
     }
 
-    // ⭐️ استفاده از createProjectRouting برای تمام کتگوری‌ها
-    const selectedCategory = categoryData?.data.items?.find((item) => item.ID === categoryId);
+    if (selectedCategory?.title === 'regal') {
+      router.push(`${paths.project.project_information}`);
+      return;
+    }
 
-    if (selectedCategory) {
-      const routePath = createProjectRouting(selectedCategory.title);
-      router.push(routePath);
+    if (acceptedFileType === 'multi-images') {
+      router.push(`${paths.project.decoro_sphere}`);
     } else {
-      // fallback قدیمی
-      if (acceptedFileType === 'multi-images') {
-        router.push(`${paths.project.decoro_sphere}`);
-      } else {
-        router.push(`${paths.project.project_information}`);
-      }
+      router.push(`${paths.project.project_information}`);
     }
   };
 

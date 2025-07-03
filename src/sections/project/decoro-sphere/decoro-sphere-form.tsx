@@ -319,8 +319,9 @@ function DecoroSphereFrom() {
               name="isCircle"
               options={carpet_shape(t)}
               onChange={(e) => {
-                const isCircleValue = e.target.value === 'true'; // 'true' as string to true as boolean
-                setValue('isCircle', isCircleValue, { shouldValidate: true });
+                const { value } = e.target;
+                setValue('isCircle', value === 'true', { shouldValidate: true });
+                setValue('size', '', { shouldValidate: true });
               }}
             />
             <Divider />
