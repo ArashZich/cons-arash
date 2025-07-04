@@ -35,7 +35,6 @@ import { useBoolean } from 'src/hooks/use-boolean';
 // components
 import {
   useTable,
-  getComparator,
   emptyRows,
   TableNoData,
   TableSkeleton,
@@ -83,6 +82,10 @@ export default function ProjectListView({ ID }: Props) {
   const [filters, setFilters] = useState(defaultFilters);
   const [totalRows, setTotalRows] = useState(5);
 
+  // اضافه کردن state برای server-side sorting
+  const [serverOrder, setServerOrder] = useState<'asc' | 'desc'>('desc');
+  const [serverOrderBy, setServerOrderBy] = useState<string>('created_at');
+
   const TABLE_HEAD = [
     { id: 'name', label: t('project.projects'), width: 160 },
     { id: 'created_at', label: t('project.created_at'), width: 160 },
@@ -97,7 +100,8 @@ export default function ProjectListView({ ID }: Props) {
     refetch,
   } = useProductsQuery({
     page: table.page,
-    // per_page: table.rowsPerPage,
+    order: serverOrder, // از server state استفاده می‌کنیم
+    order_by: serverOrderBy, // از server state استفاده می‌کنیم
     filters: {
       category_id: {
         op: FilterOperatorsEnum._,
@@ -113,6 +117,20 @@ export default function ProjectListView({ ID }: Props) {
   const visible = useBoolean();
   const editDialog = useBoolean();
 
+  // Custom sort handler
+  const handleSort = useCallback(
+    (id: string) => {
+      if (serverOrderBy === id) {
+        setServerOrder(serverOrder === 'asc' ? 'desc' : 'asc');
+      } else {
+        setServerOrderBy(id);
+        setServerOrder('asc');
+      }
+      table.onResetPage(); // صفحه رو به اول برگردونید
+    },
+    [serverOrder, serverOrderBy, table]
+  );
+
   useEffect(() => {
     if (projects?.data.items.length) {
       setTableData(projects?.data.items);
@@ -120,10 +138,12 @@ export default function ProjectListView({ ID }: Props) {
     }
   }, [projects?.data.items, projects?.data.totalRows]);
 
-  const dataFiltered = applyFilter({
-    inputData: tableData,
-    comparator: getComparator(table.order, table.orderBy),
-    filters,
+  // فقط فیلتر کنید، سورت نکنید - حذف getComparator
+  const dataFiltered = tableData.filter((product) => {
+    if (filters.name) {
+      return product.name.toLowerCase().indexOf(filters.name.toLowerCase()) !== -1;
+    }
+    return true;
   });
 
   const dataInPage = dataFiltered.slice(
@@ -321,12 +341,12 @@ export default function ProjectListView({ ID }: Props) {
             <Scrollbar>
               <Table size="medium" sx={{ minWidth: 960 }}>
                 <TableHeadCustom
-                  order={table.order}
-                  orderBy={table.orderBy}
+                  order={serverOrder}
+                  orderBy={serverOrderBy}
                   headLabel={TABLE_HEAD}
                   rowCount={tableData.length}
                   numSelected={table.selected.length}
-                  onSort={table.onSort}
+                  onSort={handleSort}
                   onSelectAllRows={(checked) =>
                     table.onSelectAllRows(
                       checked,
@@ -364,7 +384,7 @@ export default function ProjectListView({ ID }: Props) {
 
                   <TableEmptyRows
                     height={denseHeight}
-                    emptyRows={emptyRows(table.page, table.rowsPerPage, tableData.length)}
+                    emptyRows={emptyRows(table.page, table.rowsPerPage, dataFiltered.length)}
                   />
 
                   <TableNoData notFound={notFound} />
@@ -403,36 +423,4 @@ export default function ProjectListView({ ID }: Props) {
       />
     </>
   );
-}
-
-// ----------------------------------------------------------------------
-
-function applyFilter({
-  inputData,
-  comparator,
-  filters,
-}: {
-  inputData: ProductData[];
-  comparator: (a: any, b: any) => number;
-  filters: IProjectTableFilters;
-}) {
-  const { name } = filters;
-
-  const stabilizedThis = inputData.map((el, index) => [el, index] as const);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => el[0]);
-
-  if (name) {
-    inputData = inputData.filter(
-      (product) => product.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
-    );
-  }
-
-  return inputData;
 }

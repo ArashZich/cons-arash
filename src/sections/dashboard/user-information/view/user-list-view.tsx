@@ -35,7 +35,6 @@ import { useBoolean } from 'src/hooks/use-boolean';
 // components
 import {
   useTable,
-  getComparator,
   emptyRows,
   TableNoData,
   TableSkeleton,
@@ -73,6 +72,10 @@ export default function UserListView() {
   const [filters, setFilters] = useState(defaultFilters);
   const [totalRows, setTotalRows] = useState(5);
 
+  // اضافه کردن state برای server-side sorting
+  const [serverOrder, setServerOrder] = useState<'asc' | 'desc'>('desc');
+  const [serverOrderBy, setServerOrderBy] = useState<string>('created_at');
+
   const TABLE_HEAD = [
     { id: 'name', label: t('user_information.user'), width: 160 },
     { id: 'organization_count', label: t('user_information.organization_count'), width: 160 },
@@ -84,6 +87,8 @@ export default function UserListView() {
   const { data: userData, isLoading: userLoading } = useGetAllUsersQuery({
     page: table.page,
     per_page: totalRows,
+    order: serverOrder, // از server state استفاده می‌کنیم
+    order_by: serverOrderBy, // از server state استفاده می‌کنیم
     affiliate_codes:
       user && user?.affiliate_codes?.length > 0 ? user.affiliate_codes.split(', ') : '',
     has_organization: filters.hasOrganization,
@@ -92,6 +97,20 @@ export default function UserListView() {
 
   const confirm = useBoolean();
 
+  // Custom sort handler
+  const handleSort = useCallback(
+    (id: string) => {
+      if (serverOrderBy === id) {
+        setServerOrder(serverOrder === 'asc' ? 'desc' : 'asc');
+      } else {
+        setServerOrderBy(id);
+        setServerOrder('asc');
+      }
+      table.onResetPage(); // صفحه رو به اول برگردونید
+    },
+    [serverOrder, serverOrderBy, table]
+  );
+
   useEffect(() => {
     if (userData?.data.items.length) {
       setTableData(userData?.data.items);
@@ -99,10 +118,20 @@ export default function UserListView() {
     }
   }, [userData?.data.items, userData?.data.totalRows]);
 
-  const dataFiltered = applyFilter({
-    inputData: tableData,
-    comparator: getComparator(table.order, table.orderBy),
-    filters,
+  // فقط فیلتر کنید، سورت نکنید - حذف getComparator
+  const dataFiltered = tableData.filter((item) => {
+    if (filters.name) {
+      const searchWords = filters.name.toLowerCase().trim().split(/\s+/);
+      const { name: firstName, last_name: lastName, phone } = item;
+      const itemFirstName = firstName.toLowerCase();
+      const itemLastName = lastName.toLowerCase();
+
+      return searchWords.some(
+        (word) =>
+          itemFirstName.includes(word) || itemLastName.includes(word) || phone.includes(word)
+      );
+    }
+    return true;
   });
 
   const denseHeight = table.dense ? 60 : 80;
@@ -211,12 +240,12 @@ export default function UserListView() {
           <Scrollbar>
             <Table size="medium" sx={{ minWidth: 960 }}>
               <TableHeadCustom
-                order={table.order}
-                orderBy={table.orderBy}
+                order={serverOrder}
+                orderBy={serverOrderBy}
                 headLabel={TABLE_HEAD}
                 rowCount={tableData.length}
                 numSelected={table.selected.length}
-                onSort={table.onSort}
+                onSort={handleSort}
                 onSelectAllRows={(checked) =>
                   table.onSelectAllRows(
                     checked,
@@ -251,7 +280,7 @@ export default function UserListView() {
 
                 <TableEmptyRows
                   height={denseHeight}
-                  emptyRows={emptyRows(table.page, table.rowsPerPage, tableData.length)}
+                  emptyRows={emptyRows(table.page, table.rowsPerPage, dataFiltered.length)}
                 />
 
                 <TableNoData notFound={notFound} />
@@ -270,47 +299,4 @@ export default function UserListView() {
       </Card>
     </Stack>
   );
-}
-
-// ----------------------------------------------------------------------
-
-function applyFilter({
-  inputData,
-  comparator,
-  filters,
-}: {
-  inputData: UserData[];
-  comparator: (a: any, b: any) => number;
-  filters: IProjectTableFilters;
-}) {
-  const { name } = filters;
-
-  const stabilizedThis = inputData.map((el, index) => [el, index] as const);
-
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-
-  inputData = stabilizedThis.map((el) => {
-    const [item] = el; // از destructuring استفاده کردیم
-    return item;
-  });
-
-  if (name) {
-    const searchWords = name.toLowerCase().trim().split(/\s+/);
-    inputData = inputData.filter((item) => {
-      const { name: firstName, last_name: lastName, phone } = item; // از destructuring استفاده کردیم
-      const itemFirstName = firstName.toLowerCase();
-      const itemLastName = lastName.toLowerCase();
-
-      return searchWords.some(
-        (word) =>
-          itemFirstName.includes(word) || itemLastName.includes(word) || phone.includes(word)
-      );
-    });
-  }
-
-  return inputData;
 }
