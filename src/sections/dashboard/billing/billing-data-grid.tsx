@@ -1,7 +1,7 @@
 // @mui
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
-// import Button from '@mui/material/Button';
+import Button from '@mui/material/Button';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
@@ -14,6 +14,7 @@ import isEmpty from 'lodash/isEmpty';
 import { useLocales } from 'src/locales';
 // utils
 import { fDate, jfDate } from 'src/utils/format-time';
+import { fNumber } from 'src/utils/format-number';
 // components
 import Scrollbar from 'src/components/scrollbar';
 import { TableHeadCustom, TableNoData } from 'src/components/table';
@@ -25,6 +26,9 @@ import { FilterOperatorsEnum } from 'src/_types/site/filters';
 // redux
 import { useSelector } from 'src/redux/store';
 import { organizationSelector } from 'src/redux/slices/organization';
+// routes
+import { useRouter } from 'src/routes/hooks';
+import { paths } from 'src/routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -42,6 +46,8 @@ export default function BillingDataGrid() {
   const { t, isRtl } = useLocales();
   const organization = useSelector(organizationSelector);
   const theme = useTheme();
+  const router = useRouter();
+
   const TABLE_HEAD = [
     { id: 'date', label: t('billing.date') },
     { id: 'title', label: t('billing.title'), align: 'right' },
@@ -63,10 +69,6 @@ export default function BillingDataGrid() {
     },
   });
 
-  // console.log(data);
-
-  if (isLoading) return <SplashScreen />;
-
   const checkStatusBgColor = (status: string) => {
     if (status === 'paid') {
       return theme.palette.success.main;
@@ -76,6 +78,12 @@ export default function BillingDataGrid() {
     }
     return theme.palette.info.main;
   };
+
+  const handleViewInvoice = (invoiceId: number) => {
+    router.push(paths.dashboard.billing.details(invoiceId));
+  };
+
+  if (isLoading) return <SplashScreen />;
 
   return (
     <TableContainer component={Card} sx={{ mt: 3, overflow: 'unset' }}>
@@ -87,8 +95,10 @@ export default function BillingDataGrid() {
             {data?.data.items.map((row) => (
               <TableRow key={row.ID}>
                 <TableCell>{isRtl ? jfDate(row.created_at) : fDate(row.created_at)}</TableCell>
-                <TableCell align="right">{t(`plan.${row.invoice_items[0].title}`)}</TableCell>
-                <TableCell align="right">{row.final_paid_amount.toLocaleString()}</TableCell>
+                <TableCell align="right">
+                  {row.invoice_items[0]?.title ? t(`plan.${row.invoice_items[0].title}`) : '-'}
+                </TableCell>
+                <TableCell align="right">{fNumber(row.final_paid_amount)} تومان</TableCell>
                 <TableCell align="right">
                   <Stack sx={{ alignItems: 'center' }}>
                     <Stack
@@ -99,21 +109,24 @@ export default function BillingDataGrid() {
                         py: 0.25,
                         px: 0.75,
                         borderRadius: '6px',
+                        typography: 'caption',
+                        fontWeight: 'fontWeightMedium',
                       }}
                     >
                       {t(`billing.${row.status}`)}
                     </Stack>
                   </Stack>
                 </TableCell>
-                {/* <TableCell align="right">
-                    <Button
-                      onClick={() => handleInvoice(row.ID)}
-                      variant="outlined"
-                      // disabled={row.status !== 'paid'}
-                    >
-                      {t('billing.view_invoice')}
-                    </Button>
-                  </TableCell> */}
+                <TableCell align="right">
+                  <Button
+                    onClick={() => handleViewInvoice(row.ID)}
+                    variant="outlined"
+                    size="small"
+                    disabled={row.status !== 'paid'}
+                  >
+                    {t('billing.view_invoice')}
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
             <TableNoData notFound={isEmpty(data?.data.items)} />

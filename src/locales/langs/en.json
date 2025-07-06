@@ -795,7 +795,10 @@
     "registration_number": "Registration Number:",
     "postal_code": "Postal Code:",
     "address": "Address:",
-    "phone_number": "Phone Number:"
+    "phone_number": "Phone Number:",
+    "price": "Price",
+    "qty": "quantity",
+    "invoice": "Invoice"
   },
   "plan_management": {
     "plan_management_new": "Creat a New Plan",

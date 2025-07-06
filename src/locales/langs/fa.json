@@ -796,7 +796,10 @@
     "registration_number": "شماره ثبت:",
     "postal_code": "کد پستی:",
     "address": "آدرس:",
-    "phone_number": "شماره تلفن:"
+    "phone_number": "شماره تلفن:",
+    "price": "قیمت",
+    "qty": "تعداد",
+    "invoice": "فاکتور"
   },
   "plan_management": {
     "plan_management_new": "ایجاد بسته جدید",
