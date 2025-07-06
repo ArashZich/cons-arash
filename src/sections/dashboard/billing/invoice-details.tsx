@@ -52,19 +52,18 @@ export default function InvoiceDetails({ id }: Props) {
   const { t, isRtl } = useLocales();
 
   const { data, isLoading } = useInvoicesQuery({ id }, { enabled: !!id });
-  console.log(data, 'data');
 
   const renderTotal = (
     <>
-      <StyledTableRow>
+      {/* <StyledTableRow>
         <TableCell colSpan={3} />
         <TableCell sx={{ color: 'text.secondary' }}>{t('billing.subtotal')}</TableCell>
         <TableCell width={120} sx={{ typography: 'body2' }}>
           {fNumber(data?.data?.items[0]?.invoice_items[0]?.total_price || 0)}
         </TableCell>
-      </StyledTableRow>
+      </StyledTableRow> */}
 
-      <StyledTableRow>
+      {/* <StyledTableRow>
         <TableCell colSpan={3} />
         <TableCell sx={{ color: 'text.secondary' }}>{t('billing.discount')}</TableCell>
         <TableCell width={120} sx={{ color: 'error.main', typography: 'body2' }}>
@@ -76,11 +75,11 @@ export default function InvoiceDetails({ id }: Props) {
         <TableCell colSpan={3} />
         <TableCell sx={{ color: 'text.secondary' }}>{t('billing.taxes')}</TableCell>
         <TableCell width={120}>{fNumber(data?.data?.items[0]?.tax_amount || 0)}</TableCell>
-      </StyledTableRow>
+      </StyledTableRow> */}
 
       <StyledTableRow>
         <TableCell colSpan={3} />
-        <TableCell sx={{ typography: 'subtitle1' }}>{t('billing.total')}</TableCell>
+        <TableCell sx={{ typography: 'subtitle1' }}>{t('billing.paid')}</TableCell>
         <TableCell width={140} sx={{ typography: 'subtitle1' }}>
           {fNumber(data?.data?.items[0]?.final_paid_amount || 0)}
         </TableCell>

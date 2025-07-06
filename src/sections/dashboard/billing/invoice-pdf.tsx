@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 // @react-pdf
 import { Page, View, Text, Image, Document, Font, StyleSheet } from '@react-pdf/renderer';
 // utils
-import { fDate, jfDate } from 'src/utils/format-time';
+import { fDateNumeric } from 'src/utils/format-time';
 import { fNumber } from 'src/utils/format-number';
 // locales
 import { useLocales } from 'src/locales';
@@ -54,7 +54,16 @@ const useStyles = () =>
         alignLeft: { textAlign: 'left' },
         alignCenter: { textAlign: 'center' },
 
-        // Page (padding کمتر)
+        dateText: {
+          fontSize: 8,
+          lineHeight: 1.3,
+          fontFamily: 'IRANSansWeb',
+          direction: 'rtl', // اضافه کردن direction مخصوص
+          textAlign: 'right',
+          unicodeBidi: 'plaintext', // اضافه کردن برای پشتیبانی unicode
+        },
+
+        // Page با تنظیمات بهتر
         page: {
           fontSize: 7,
           lineHeight: 1.4,
@@ -62,6 +71,7 @@ const useStyles = () =>
           backgroundColor: '#FFFFFF',
           padding: '20px 16px 60px 16px',
           direction: 'rtl',
+          unicodeBidi: 'plaintext', // اضافه کردن
         },
 
         // Header
@@ -227,9 +237,7 @@ export default function InvoicePDF({ data }: Props) {
           </View>
           <View style={styles.col6}>
             <Text style={[styles.subtitle2, styles.mb4]}>{t('billing.date_create')}</Text>
-            <Text style={styles.body1}>
-              {isRtl ? jfDate(data?.invoice.created_at) : fDate(data?.invoice.created_at)}
-            </Text>
+            <Text style={styles.body1}>{fDateNumeric(data?.invoice.created_at, isRtl)}</Text>
           </View>
         </View>
 
@@ -289,7 +297,7 @@ export default function InvoicePDF({ data }: Props) {
           <View style={[styles.divider, { marginVertical: 6 }]} />
 
           {/* Subtotal */}
-          <View style={styles.tableRowTotal}>
+          {/* <View style={styles.tableRowTotal}>
             <View style={styles.summaryLabel}>
               <Text style={styles.body1}>{t('billing.subtotal')}</Text>
             </View>
@@ -298,10 +306,10 @@ export default function InvoicePDF({ data }: Props) {
                 {fNumber(data?.invoice.invoice_items[0]?.total_price || 0)}
               </Text>
             </View>
-          </View>
+          </View> */}
 
           {/* Discount */}
-          <View style={styles.tableRowTotal}>
+          {/* <View style={styles.tableRowTotal}>
             <View style={styles.summaryLabel}>
               <Text style={styles.body1}>{t('billing.discount')}</Text>
             </View>
@@ -310,17 +318,17 @@ export default function InvoicePDF({ data }: Props) {
                 -{fNumber(data?.invoice?.invoice_items[0]?.discounted_price || 0)}
               </Text>
             </View>
-          </View>
+          </View> */}
 
           {/* Tax */}
-          <View style={styles.tableRowTotal}>
+          {/* <View style={styles.tableRowTotal}>
             <View style={styles.summaryLabel}>
               <Text style={styles.body1}>{t('billing.taxes')}</Text>
             </View>
             <View style={styles.summaryValue}>
               <Text style={styles.body1}>{fNumber(data?.invoice?.tax_amount || 0)}</Text>
             </View>
-          </View>
+          </View> */}
 
           {/* Total */}
           <View
@@ -330,7 +338,7 @@ export default function InvoicePDF({ data }: Props) {
             ]}
           >
             <View style={styles.summaryLabel}>
-              <Text style={styles.h4}>{t('billing.total')}</Text>
+              <Text style={styles.h4}>{t('billing.paid')}</Text>
             </View>
             <View style={styles.summaryValue}>
               <Text style={[styles.h4, { color: '#1976D2' }]}>
