@@ -190,9 +190,9 @@ export default function PricingSession({
 
   return (
     <Stack spacing={5} width={{ md: 1152 }} sx={{ mt: 3 }}>
-      <Grid container spacing={2} justifyContent="center">
+      <Grid container spacing={4} justifyContent="center">
         {/* Dynamic Plan Card */}
-        <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Grid item xs={12} sm={12} md={12} lg={12}>
           <DynamicPlanCard
             categoryId={parseInt(categoryId)}
             onBuy={handleDynamicBuy}

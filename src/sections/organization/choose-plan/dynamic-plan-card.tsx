@@ -40,21 +40,6 @@ interface DynamicPlanCardProps {
   loading?: boolean;
 }
 
-const MONTH_MARKS = [
-  { value: 1, label: '1' },
-  { value: 3, label: '3' },
-  { value: 6, label: '6' },
-  { value: 12, label: '12' },
-];
-
-const PRODUCT_MARKS = [
-  { value: 1, label: '1' },
-  { value: 25, label: '25' },
-  { value: 100, label: '100' },
-  { value: 500, label: '500' },
-  { value: 1000, label: '1000' },
-];
-
 export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicPlanCardProps) {
   const { t, currentLang } = useLocales();
   const { enqueueSnackbar } = useSnackbar();
@@ -184,15 +169,14 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
           <Slider
             value={productCount}
             onChange={(_, value) => setProductCount(value as number)}
-            min={1}
-            max={1000}
-            step={1}
+            min={10}
+            max={5000}
+            step={10}
             marks={[
-              { value: 1, label: '1' },
-              { value: 25, label: '25' },
-              { value: 100, label: '100' },
-              { value: 500, label: '500' },
+              { value: 10, label: '10' },
               { value: 1000, label: '1000' },
+              { value: 3000, label: '3000' },
+              { value: 5000, label: '5000' },
             ]}
             valueLabelDisplay="auto"
             sx={{ color: 'secondary.main' }}
