@@ -1,7 +1,7 @@
 // src/_types/reality/category/categoryFeatures.ts
 
 export interface CategoryFeatureData {
-  id: number;
+  ID: number;
   name: string;
   title: string;
   description: string;

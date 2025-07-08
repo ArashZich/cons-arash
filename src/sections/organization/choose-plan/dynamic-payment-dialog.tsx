@@ -88,22 +88,23 @@ export default function DynamicPaymentDialog({
             {pricing.configuration.product_count} {t('organization.items')}
           </Typography>
         </Stack>
-        {pricing.configuration.selected_features.length > 0 && (
-          <Stack spacing={1}>
-            <Typography variant="body2">{t('organization.selected_features')}:</Typography>
-            <Stack direction="row" flexWrap="wrap" gap={0.5}>
-              {pricing.configuration.selected_features.map((feature) => (
-                <Chip
-                  key={feature.id}
-                  label={feature.title}
-                  size="small"
-                  variant="outlined"
-                  color="primary"
-                />
-              ))}
+        {pricing.configuration.selected_features &&
+          pricing.configuration.selected_features.length > 0 && (
+            <Stack spacing={1}>
+              <Typography variant="body2">{t('organization.selected_features')}:</Typography>
+              <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                {pricing.configuration.selected_features.map((feature) => (
+                  <Chip
+                    key={feature.id}
+                    label={feature.title}
+                    size="small"
+                    variant="outlined"
+                    color="primary"
+                  />
+                ))}
+              </Stack>
             </Stack>
-          </Stack>
-        )}
+          )}
       </Stack>
     </Box>
   );
@@ -124,24 +125,25 @@ export default function DynamicPaymentDialog({
       </Stack>
 
       {/* Features */}
-      {pricing.pricing.features.map((feature) => (
-        <Stack
-          key={feature.feature_id}
-          direction="row-reverse"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Typography variant="body2" fontWeight={600}>
-            {formatPrice(feature.amount)}
-          </Typography>
-          <Stack>
-            <Typography variant="body2">{feature.title}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              {feature.calculation}
+      {pricing.pricing.features &&
+        pricing.pricing.features.map((feature) => (
+          <Stack
+            key={feature.feature_id}
+            direction="row-reverse"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography variant="body2" fontWeight={600}>
+              {formatPrice(feature.amount)}
             </Typography>
+            <Stack>
+              <Typography variant="body2">{feature.title}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {feature.calculation}
+              </Typography>
+            </Stack>
           </Stack>
-        </Stack>
-      ))}
+        ))}
 
       {/* Subtotal */}
       <Divider />
@@ -153,7 +155,7 @@ export default function DynamicPaymentDialog({
       </Stack>
 
       {/* Auto Discount */}
-      {pricing.discounts.auto_discount.total_discount > 0 && (
+      {pricing.discounts.auto_discount && pricing.discounts.auto_discount.total_discount > 0 && (
         <Stack direction="row-reverse" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" color="success.main" fontWeight={600}>
             -{formatPrice(pricing.discounts.auto_discount.total_discount)}

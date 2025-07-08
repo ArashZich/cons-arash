@@ -42,13 +42,13 @@ interface DynamicPlanCardProps {
 
 const MONTH_MARKS = [
   { value: 1, label: '1' },
+  { value: 3, label: '3' },
   { value: 6, label: '6' },
   { value: 12, label: '12' },
-  { value: 24, label: '24' },
 ];
 
 const PRODUCT_MARKS = [
-  { value: 5, label: '5' },
+  { value: 1, label: '1' },
   { value: 25, label: '25' },
   { value: 100, label: '100' },
   { value: 500, label: '500' },
@@ -59,8 +59,8 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
   const { t, currentLang } = useLocales();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [months, setMonths] = useState(6);
-  const [productCount, setProductCount] = useState(25);
+  const [months, setMonths] = useState(3);
+  const [productCount, setProductCount] = useState(10);
   const [selectedFeatures, setSelectedFeatures] = useState<number[]>([]);
   const [calculatedPricing, setCalculatedPricing] = useState<
     CalculatePriceResponseType['data'] | null
@@ -71,6 +71,10 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
     { categoryId },
     { enabled: !!categoryId }
   );
+
+  // Debug features data
+  console.log('🎯 Features data:', featuresData);
+  console.log('🏷️ Category ID:', categoryId);
 
   // Calculate price mutation
   const { mutateAsync: calculatePrice, isLoading: calculating } = useCalculatePriceMutation();
@@ -85,6 +89,13 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
 
   const handleCalculatePrice = async () => {
     try {
+      console.log('🔄 Calculating price...', {
+        category_id: categoryId,
+        months,
+        product_count: productCount,
+        feature_ids: selectedFeatures,
+      });
+
       const response = await calculatePrice({
         category_id: categoryId,
         months,
@@ -92,10 +103,16 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
         feature_ids: selectedFeatures,
       });
 
-      if (response.success) {
+      console.log('💰 Price response:', response);
+
+      if (response?.data) {
         setCalculatedPricing(response.data);
+        console.log('✅ Pricing set successfully');
+      } else {
+        console.error('❌ No data in response');
       }
     } catch (error) {
+      console.error('❌ Calculate price error:', error);
       enqueueSnackbar(error?.message || t('organization.calculation_error'), {
         variant: 'error',
       });
@@ -120,19 +137,15 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [months, productCount, selectedFeatures]);
+  }, [months, productCount, selectedFeatures, categoryId]);
 
   const renderHeader = (
-    <Stack spacing={1}>
-      <Stack direction="row" alignItems="center" spacing={1}>
-        <Iconify icon="solar:settings-bold-duotone" width={24} sx={{ color: 'primary.main' }} />
-        <Typography variant="h6" sx={{ color: 'primary.main' }}>
+    <Stack spacing={2}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Typography variant="h6" sx={{ textTransform: 'capitalize', color: 'secondary.dark' }}>
           {t('organization.dynamic_plan')}
         </Typography>
       </Stack>
-      <Typography variant="body2" color="text.secondary">
-        {t('organization.customize_your_plan')}
-      </Typography>
     </Stack>
   );
 
@@ -140,32 +153,48 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
     <Stack spacing={3}>
       {/* Month Selector */}
       <Stack spacing={2}>
-        <Typography variant="subtitle2">{t('organization.duration_months')}</Typography>
+        <Typography variant="subtitle2">
+          {t('organization.duration_months')} ({months} {t('organization.months')})
+        </Typography>
         <Box px={1}>
           <Slider
             value={months}
             onChange={(_, value) => setMonths(value as number)}
             min={1}
-            max={24}
-            marks={MONTH_MARKS}
-            valueLabelDisplay="on"
-            sx={{ color: 'primary.main' }}
+            max={12}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 3, label: '3' },
+              { value: 6, label: '6' },
+              { value: 12, label: '12' },
+            ]}
+            valueLabelDisplay="auto"
+            sx={{ color: 'secondary.main' }}
           />
         </Box>
       </Stack>
 
       {/* Product Count Selector */}
       <Stack spacing={2}>
-        <Typography variant="subtitle2">{t('organization.product_count')}</Typography>
+        <Typography variant="subtitle2">
+          {t('organization.product_count')} ({productCount} {t('organization.products')})
+        </Typography>
         <Box px={1}>
           <Slider
             value={productCount}
             onChange={(_, value) => setProductCount(value as number)}
-            min={5}
+            min={1}
             max={1000}
-            step={5}
-            marks={PRODUCT_MARKS}
-            valueLabelDisplay="on"
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 25, label: '25' },
+              { value: 100, label: '100' },
+              { value: 500, label: '500' },
+              { value: 1000, label: '1000' },
+            ]}
+            valueLabelDisplay="auto"
             sx={{ color: 'secondary.main' }}
           />
         </Box>
@@ -174,35 +203,41 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
       {/* Features Selection */}
       {featuresLoading ? (
         <Stack alignItems="center" py={2}>
-          <CircularProgress size={24} />
+          <CircularProgress size={24} color="secondary" />
         </Stack>
       ) : (
         <Stack spacing={2}>
           <Typography variant="subtitle2">{t('organization.additional_features')}</Typography>
           <FormGroup>
-            {featuresData?.data?.map((feature) => (
-              <FormControlLabel
-                key={feature.id}
-                control={
-                  <Checkbox
-                    checked={selectedFeatures.includes(feature.id)}
-                    onChange={() => handleFeatureToggle(feature.id)}
-                    size="small"
-                  />
-                }
-                label={
-                  <Stack direction="row" alignItems="center" spacing={1} sx={{ flex: 1 }}>
-                    <Typography variant="body2">{feature.title}</Typography>
-                    <Chip
-                      label={formatPrice(feature.price)}
+            {featuresData?.data
+              ?.filter((feature) => feature.ID && feature.category_ids.includes(categoryId))
+              ?.map((feature) => (
+                <FormControlLabel
+                  key={`feature-${feature.ID}`}
+                  control={
+                    <Checkbox
+                      checked={selectedFeatures.includes(feature.ID)}
+                      onChange={() => handleFeatureToggle(feature.ID)}
                       size="small"
-                      variant="outlined"
-                      sx={{ ml: 'auto' }}
+                      color="secondary"
+                      value={feature.ID}
+                      name={`feature-${feature.ID}`}
                     />
-                  </Stack>
-                }
-              />
-            ))}
+                  }
+                  label={
+                    <Stack direction="row" alignItems="center" spacing={1} sx={{ flex: 1 }}>
+                      <Typography variant="body2">{feature.title}</Typography>
+                      <Chip
+                        label={formatPrice(feature.price)}
+                        size="small"
+                        variant="outlined"
+                        color="secondary"
+                        sx={{ ml: 'auto' }}
+                      />
+                    </Stack>
+                  }
+                />
+              ))}
           </FormGroup>
         </Stack>
       )}
@@ -215,7 +250,7 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
 
       {calculating ? (
         <Stack alignItems="center" py={2}>
-          <CircularProgress size={24} />
+          <CircularProgress size={24} color="secondary" />
           <Typography variant="caption" color="text.secondary">
             {t('organization.calculating')}
           </Typography>
@@ -231,7 +266,7 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
           </Stack>
 
           {/* Features */}
-          {calculatedPricing.pricing.features.length > 0 && (
+          {calculatedPricing.pricing.features && calculatedPricing.pricing.features.length > 0 && (
             <Stack direction="row" justifyContent="space-between">
               <Typography variant="body2">{t('organization.features_total')}</Typography>
               <Typography variant="body2" fontWeight={600}>
@@ -241,26 +276,29 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
           )}
 
           {/* Discount */}
-          {calculatedPricing.discounts.auto_discount.total_discount > 0 && (
-            <Stack direction="row" justifyContent="space-between">
-              <Typography variant="body2" color="success.main">
-                {t('organization.auto_discount')} (
-                {calculatedPricing.discounts.auto_discount.percentage}%)
-              </Typography>
-              <Typography variant="body2" color="success.main" fontWeight={600}>
-                -{formatPrice(calculatedPricing.discounts.auto_discount.total_discount)}
-              </Typography>
-            </Stack>
-          )}
+          {calculatedPricing.discounts.auto_discount &&
+            calculatedPricing.discounts.auto_discount.total_discount > 0 && (
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="success.main">
+                  {t('organization.auto_discount')} (
+                  {calculatedPricing.discounts.auto_discount.percentage}%)
+                </Typography>
+                <Typography variant="body2" color="success.main" fontWeight={600}>
+                  -{formatPrice(calculatedPricing.discounts.auto_discount.total_discount)}
+                </Typography>
+              </Stack>
+            )}
 
           <Divider />
 
           {/* Final Price */}
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6">{t('organization.final_price')}</Typography>
-            <Typography variant="h5" color="primary.main" fontWeight={700}>
-              {formatPrice(calculatedPricing.summary.final_price)}
-            </Typography>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Stack>
+              <Typography variant="h4" color="secondary.main" fontWeight={700}>
+                {formatPrice(calculatedPricing.summary.final_price)}
+              </Typography>
+            </Stack>
+            <Typography variant="h6">{t('organization.toman')}</Typography>
           </Stack>
 
           {/* Savings */}
@@ -279,15 +317,25 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
     </Stack>
   );
 
+  // Check if buy button should be enabled
+  const isBuyButtonEnabled = !calculating && !!calculatedPricing && !loading;
+
+  console.log('🔘 Buy button state:', {
+    calculating,
+    calculatedPricing: !!calculatedPricing,
+    loading,
+    isBuyButtonEnabled,
+  });
+
   return (
     <Card
       sx={{
-        p: 3,
+        p: 5,
         borderRadius: 2,
-        border: '2px solid',
-        borderColor: 'primary.light',
+        boxShadow: '0px 8px 16px 0px rgba(145, 158, 171, 0.16)',
         position: 'relative',
-        minHeight: 600,
+        overflow: 'visible',
+        minHeight: 460,
       }}
     >
       <Stack spacing={3} sx={{ height: '100%' }}>
@@ -298,12 +346,17 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
         <Button
           fullWidth
           size="large"
-          variant="contained"
+          variant="outlined"
+          color="inherit"
           onClick={handleBuyClick}
-          disabled={!calculatedPricing || loading}
+          disabled={!isBuyButtonEnabled}
           sx={{ mt: 'auto' }}
           startIcon={
-            loading ? <CircularProgress size={20} /> : <Iconify icon="solar:cart-plus-bold" />
+            loading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <Iconify icon="solar:cart-plus-bold" />
+            )
           }
         >
           {t('organization.buy_dynamic_plan')}
