@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 // @react-pdf
 import { Page, View, Text, Image, Document, Font, StyleSheet } from '@react-pdf/renderer';
 // utils
-import { fDateNumeric } from 'src/utils/format-time';
+import { formatDateForPDF } from 'src/utils/format-time';
 import { fNumber } from 'src/utils/format-number';
 // locales
 import { useLocales } from 'src/locales';
@@ -59,7 +59,7 @@ const useStyles = () =>
           lineHeight: 1.3,
           fontFamily: 'IRANSansWeb',
           direction: 'rtl', // اضافه کردن direction مخصوص
-          textAlign: 'right',
+          textAlign: 'left',
           unicodeBidi: 'plaintext', // اضافه کردن برای پشتیبانی unicode
         },
 
@@ -237,7 +237,7 @@ export default function InvoicePDF({ data }: Props) {
           </View>
           <View style={styles.col6}>
             <Text style={[styles.subtitle2, styles.mb4]}>{t('billing.date_create')}</Text>
-            <Text style={styles.body1}>{fDateNumeric(data?.invoice.created_at, isRtl)}</Text>
+            <Text style={styles.dateText}>{formatDateForPDF(data?.invoice.created_at, isRtl)}</Text>
           </View>
         </View>
 

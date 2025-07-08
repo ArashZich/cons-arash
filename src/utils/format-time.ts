@@ -79,32 +79,24 @@ export function formatDateForInput(dateString: string | Date): string {
   return date.toISOString().slice(0, 16); // This will return "YYYY-MM-DDTHH:mm"
 }
 
-// تصحیح شده برای format-time.ts
-
 /**
- * Formats date in numeric format without text months
- * For Persian: yyyy/MM/dd in Persian numerals
- * For English: dd/MM/yyyy in English numerals
+ * تابع مخصوص PDF که بدون LRM و RTM کار می‌کند
+ * برای نمایش صحیح تاریخ در PDF
  */
-export function fDateNumeric(date: InputValue, isRtl: boolean = false): string {
+export const formatDateForPDF = (date: string | Date, isRtl: boolean): string => {
   if (!date) return '';
 
   const dateObj = new Date(date);
-  // eslint-disable-next-line no-restricted-globals
-  if (isNaN(dateObj.getTime())) return '';
+  if (Number.isNaN(dateObj.getTime())) return '';
 
   if (isRtl) {
-    // Persian format: yyyy/MM/dd with Persian numerals
-    const persianDate = jFormat(dateObj, 'yyyy/MM/dd');
+    // تبدیل تاریخ میلادی به شمسی با date-fns-jalali
+    const shamsiDate = jFormat(dateObj, 'yyyy/MM/dd');
 
-    // Convert to Persian numerals
-    const persianNums = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-    const convertedDate = persianDate.replace(/\d/g, (digit) => persianNums[parseInt(digit)]);
-
-    // اضافه کردن LRM (Left-to-Right Mark) برای جلوگیری از برعکس شدن
-    return `\u200E${convertedDate}\u200E`;
-  } else {
-    // English format: dd/MM/yyyy
-    return format(dateObj, 'dd/MM/yyyy');
+    // برگرداندن تاریخ شمسی با اعداد انگلیسی
+    return shamsiDate;
   }
-}
+
+  // برای انگلیسی
+  return format(dateObj, 'dd/MM/yyyy');
+};
