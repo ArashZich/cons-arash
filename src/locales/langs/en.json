@@ -244,7 +244,10 @@
     "basic": "Basic",
     "custom_domain": "Custom Domain",
     "ai_assistant": "AI Assistant",
-    "premium_support": "Premium Support"
+    "premium_support": "Premium Support",
+    "dynamic": "Dynamic",
+    "dynamic_plan": "Dynamic Plan",
+    "unknown": "Unknown Plan"
   },
   "project": {
     "new_project": "New Project",
@@ -1675,7 +1678,7 @@
     "inactive": "Inactive",
     "status": "Status",
     "created_at": "Created At",
-    "currency_symbol": "$",
+    "currency_symbol": "Rial",
     "operation_failed": "Operation failed",
     "delete_error": "Delete error",
     "delete_confirm_message": "Are you sure you want to delete",
@@ -1778,6 +1781,14 @@
     "rule_updated_successfully": "Discount rule updated successfully",
     "rule_deleted_successfully": "Discount rule deleted successfully",
     "rules_deleted_successfully": "Discount rules deleted successfully",
-    "delete_rule_confirm": "Are you sure you want to delete rule \"{name}\"?"
+    "delete_rule_confirm": "Are you sure you want to delete rule \"{name}\"?",
+
+    "storage_per_product": "Storage Per Product",
+    "storage_per_product_mb": "Storage Per Product (MB)",
+    "storage_per_product_helper": "Amount of storage allocated to each product in megabytes",
+    "storage_must_be_positive": "Storage must be positive",
+    "storage_max_1000mb": "Maximum storage is 1000 megabytes",
+    "storage_required": "Storage is required",
+    "per_product": "per product"
   }
 }

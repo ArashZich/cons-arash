@@ -179,7 +179,7 @@ export default function PricingSession({
 
       router.push(url);
     } catch (e) {
-      enqueueSnackbar(e?.message, { variant: 'error' });
+      enqueueSnackbar(e?.message, { variant: 'error', autoHideDuration: 5000 });
     }
     handleDynamicDialogClose();
   };

@@ -11,6 +11,7 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
+import Chip from '@mui/material/Chip';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // locales
@@ -44,7 +45,14 @@ export default function CategoryPricingTableRow({
 }: Props) {
   const { t, currentLang } = useLocales();
 
-  const { id, category_id, price_per_product_per_month, category, created_at } = row;
+  const {
+    id,
+    category_id,
+    price_per_product_per_month,
+    storage_per_product_mb,
+    category,
+    created_at,
+  } = row;
 
   const confirm = useBoolean();
 
@@ -92,6 +100,27 @@ export default function CategoryPricingTableRow({
                 fontWeight: 600,
                 color: 'primary.main',
               }}
+              secondaryTypographyProps={{
+                component: 'span',
+                color: 'text.disabled',
+                typography: 'caption',
+              }}
+            />
+          </Stack>
+        </TableCell>
+
+        {/* 🆕 Storage Column */}
+        <TableCell>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Chip
+              label={`${storage_per_product_mb} MB`}
+              size="small"
+              variant="outlined"
+              color="info"
+              icon={<Iconify icon="solar:database-bold" />}
+            />
+            <ListItemText
+              secondary={t('admin.per_product')}
               secondaryTypographyProps={{
                 component: 'span',
                 color: 'text.disabled',

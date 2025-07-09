@@ -18,12 +18,14 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
 // locales
 import { useLocales } from 'src/locales';
 // hooks
 import { useSnackbar } from 'src/components/snackbar';
 // req-hooks
 import { useCreateCategoryPricingMutation } from 'src/_req-hooks/reality/admin/useCreateCategoryPricingMutation';
+import { useUpdateCategoryPricingMutation } from 'src/_req-hooks/reality/admin/useUpdateCategoryPricingMutation';
 import { useCategoriesQuery } from 'src/_req-hooks/reality/category/useCategoriesQuery';
 // types
 import { CategoryPricingData } from 'src/_types/reality/admin/categoryPricing';
@@ -48,6 +50,8 @@ export default function CategoryPricingNewEditDialog({ open, onClose, currentPri
   // API hooks
   const { mutateAsync: createPricing, isLoading: createLoading } =
     useCreateCategoryPricingMutation();
+  const { mutateAsync: updatePricing, isLoading: updateLoading } =
+    useUpdateCategoryPricingMutation();
   const { data: categoriesData } = useCategoriesQuery({
     per_page: 1000,
   });
@@ -57,12 +61,17 @@ export default function CategoryPricingNewEditDialog({ open, onClose, currentPri
     price_per_product_per_month: Yup.number()
       .min(0, t('admin.price_must_be_positive'))
       .required(t('admin.price_required')),
+    storage_per_product_mb: Yup.number() // 🆕 اضافه شده
+      .min(1, t('admin.storage_must_be_positive'))
+      .max(1000, t('admin.storage_max_1000mb'))
+      .required(t('admin.storage_required')),
   });
 
   const defaultValues = useMemo(
     () => ({
       category_id: currentPricing?.category_id || 0,
       price_per_product_per_month: currentPricing?.price_per_product_per_month || 0,
+      storage_per_product_mb: currentPricing?.storage_per_product_mb || 50, // 🆕 اضافه شده
     }),
     [currentPricing]
   );
@@ -83,10 +92,22 @@ export default function CategoryPricingNewEditDialog({ open, onClose, currentPri
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await createPricing({
-        category_id: data.category_id,
-        price_per_product_per_month: data.price_per_product_per_month,
-      });
+      if (isEdit && currentPricing) {
+        await updatePricing({
+          categoryId: currentPricing.category_id,
+          data: {
+            category_id: data.category_id,
+            price_per_product_per_month: data.price_per_product_per_month,
+            storage_per_product_mb: data.storage_per_product_mb,
+          },
+        });
+      } else {
+        await createPricing({
+          category_id: data.category_id,
+          price_per_product_per_month: data.price_per_product_per_month,
+          storage_per_product_mb: data.storage_per_product_mb,
+        });
+      }
 
       enqueueSnackbar(
         isEdit ? t('admin.pricing_updated_successfully') : t('admin.pricing_created_successfully'),
@@ -119,7 +140,7 @@ export default function CategoryPricingNewEditDialog({ open, onClose, currentPri
   return (
     <Dialog
       fullWidth
-      maxWidth="sm"
+      maxWidth="md"
       open={open}
       onClose={onClose}
       PaperProps={{
@@ -189,18 +210,36 @@ export default function CategoryPricingNewEditDialog({ open, onClose, currentPri
                 </Box>
               )}
 
-              {/* Price Input */}
-              <RHFTextField
-                name="price_per_product_per_month"
-                label={t('admin.price_per_product_per_month')}
-                placeholder="0"
-                type="number"
-                InputProps={{
-                  startAdornment: t('admin.currency_symbol'),
-                  endAdornment: t('admin.per_product_per_month_unit'),
-                }}
-                helperText={t('admin.price_per_product_per_month_helper')}
-              />
+              {/* Price and Storage Inputs */}
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <RHFTextField
+                    name="price_per_product_per_month"
+                    label={t('admin.price_per_product_per_month')}
+                    placeholder="0"
+                    type="number"
+                    InputProps={{
+                      startAdornment: t('admin.currency_symbol'),
+                      endAdornment: t('admin.per_product_per_month_unit'),
+                    }}
+                    helperText={t('admin.price_per_product_per_month_helper')}
+                  />
+                </Grid>
+
+                {/* 🆕 Storage Input اضافه شده */}
+                <Grid item xs={12} md={6}>
+                  <RHFTextField
+                    name="storage_per_product_mb"
+                    label={t('admin.storage_per_product_mb')}
+                    placeholder="50"
+                    type="number"
+                    InputProps={{
+                      endAdornment: 'MB',
+                    }}
+                    helperText={t('admin.storage_per_product_helper')}
+                  />
+                </Grid>
+              </Grid>
             </Stack>
           </Card>
         </DialogContent>
@@ -213,7 +252,7 @@ export default function CategoryPricingNewEditDialog({ open, onClose, currentPri
           <LoadingButton
             type="submit"
             variant="contained"
-            loading={isSubmitting || createLoading}
+            loading={isSubmitting || createLoading || updateLoading}
             startIcon={<Iconify icon="solar:check-bold" />}
             disabled={!watchedCategoryId}
           >

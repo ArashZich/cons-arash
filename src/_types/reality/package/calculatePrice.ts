@@ -58,11 +58,21 @@ export interface DiscountsData {
   auto_discount: AutoDiscount;
 }
 
+// 🆕 Storage Information اضافه شده
+export interface StorageData {
+  storage_per_product_mb: number;
+  total_storage_mb: number;
+  storage_description: string;
+  storage_calculation: string;
+  storage_formatted_gb: string;
+}
+
 export type CalculatePriceResponseType = {
   success: boolean;
   data: {
     configuration: ConfigurationData;
     pricing: PricingData;
+    storage: StorageData; // 🆕 اضافه شده
     discounts: DiscountsData;
     summary: PricingSummary;
   };

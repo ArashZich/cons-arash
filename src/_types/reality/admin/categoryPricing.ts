@@ -1,11 +1,10 @@
 // src/_types/reality/admin/categoryPricing.ts
 
-import { CategoryData } from 'src/_types/reality/category/categoryData';
-
 export interface CategoryPricingData {
   id: number;
   category_id: number;
   price_per_product_per_month: number;
+  storage_per_product_mb: number; // 🆕 اضافه شده
   category: {
     id: number;
     title: string;
@@ -17,11 +16,13 @@ export interface CategoryPricingData {
 export interface CreateCategoryPricingRequestBodyType {
   category_id: number;
   price_per_product_per_month: number;
+  storage_per_product_mb: number; // 🆕 اضافه شده
 }
 
 export interface UpdateCategoryPricingRequestBodyType {
   category_id: number;
   price_per_product_per_month: number;
+  storage_per_product_mb: number; // 🆕 اضافه شده
 }
 
 export type GetCategoryPricingListResponseType = {

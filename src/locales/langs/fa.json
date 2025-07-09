@@ -243,7 +243,10 @@
     "basic": "پایه",
     "custom_domain": "لینک اختصاصی",
     "ai_assistant": "دستیار هوش مصنوعی",
-    "premium_support": "پشتیبانی VIP"
+    "premium_support": "پشتیبانی VIP",
+    "dynamic": "داینامیک",
+    "dynamic_plan": "پلن داینامیک",
+    "unknown": "پلن نامشخص"
   },
   "project": {
     "new_project": "پروژه جدید",
@@ -1778,6 +1781,14 @@
     "rule_updated_successfully": "قانون تخفیف با موفقیت بروزرسانی شد",
     "rule_deleted_successfully": "قانون تخفیف با موفقیت حذف شد",
     "rules_deleted_successfully": "قوانین تخفیف با موفقیت حذف شدند",
-    "delete_rule_confirm": "آیا از حذف قانون «{name}» اطمینان دارید؟"
+    "delete_rule_confirm": "آیا از حذف قانون «{name}» اطمینان دارید؟",
+
+    "storage_per_product": "حافظه هر محصول",
+    "storage_per_product_mb": "حافظه هر محصول (مگابایت)",
+    "storage_per_product_helper": "مقدار حافظه اختصاص یافته به هر محصول بر حسب مگابایت",
+    "storage_must_be_positive": "حافظه باید مثبت باشد",
+    "storage_max_1000mb": "حداکثر حافظه 1000 مگابایت",
+    "storage_required": "حافظه الزامی است",
+    "per_product": "برای هر محصول"
   }
 }

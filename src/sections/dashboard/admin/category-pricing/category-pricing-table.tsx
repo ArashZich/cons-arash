@@ -45,6 +45,7 @@ import CategoryPricingNewEditDialog from './category-pricing-new-edit-dialog';
 const TABLE_HEAD = [
   { id: 'category', label: 'admin.category' },
   { id: 'price_per_product_per_month', label: 'admin.price_per_product_per_month', width: 200 },
+  { id: 'storage_per_product_mb', label: 'admin.storage_per_product', width: 160 }, // 🆕 اضافه شده
   { id: 'created_at', label: 'admin.created_at', width: 160 },
   { id: '', width: 88 },
 ];
@@ -163,7 +164,7 @@ export default function CategoryPricingTable() {
           />
 
           <Scrollbar>
-            <Table size={table.dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+            <Table size={table.dense ? 'small' : 'medium'} sx={{ minWidth: 960 }}>
               <TableHeadCustom
                 order={table.order}
                 orderBy={table.orderBy}
