@@ -86,7 +86,8 @@
     "blog": "بلاگ",
     "edit": "ویرایش",
     "details": "جزئیات",
-    "coupon": "کد تخفیف"
+    "coupon": "کد تخفیف",
+    "dynamic_plan": "بسته‌های داینامیک"
   },
   "organization": {
     "welcome": "خوش آمدید",
@@ -246,7 +247,9 @@
     "premium_support": "پشتیبانی VIP",
     "dynamic": "داینامیک",
     "dynamic_plan": "پلن داینامیک",
-    "unknown": "پلن نامشخص"
+    "unknown": "پلن نامشخص",
+    "remove_watermark": "حذف واترمارک",
+    "showroom_builder": "ساختن شوروم"
   },
   "project": {
     "new_project": "پروژه جدید",

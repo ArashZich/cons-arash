@@ -65,7 +65,12 @@ export default function CategoryPricingTable() {
   const [selectedPricing, setSelectedPricing] = useState<CategoryPricingData | null>(null);
 
   // API hooks
-  const { data: pricingData, isLoading: pricingLoading, refetch } = useCategoryPricingListQuery();
+  const {
+    data: pricingData,
+    isLoading: pricingLoading,
+    isSuccess,
+    refetch,
+  } = useCategoryPricingListQuery();
 
   const { mutateAsync: deletePricing, isLoading: deleteLoading } =
     useDeleteCategoryPricingMutation();
@@ -124,7 +129,7 @@ export default function CategoryPricingTable() {
 
   // Update table data when API data changes
   useEffect(() => {
-    if (pricingData?.success && pricingData.data) {
+    if (isSuccess && pricingData.data) {
       setTableData(pricingData.data);
     }
   }, [pricingData]);
@@ -192,7 +197,7 @@ export default function CategoryPricingTable() {
                   <>
                     {dataInPage.map((row) => (
                       <CategoryPricingTableRow
-                        key={row.id}
+                        key={row.ID}
                         row={row}
                         selected={table.selected.includes(row.category_id.toString())}
                         onSelectRow={() => table.onSelectRow(row.category_id.toString())}

@@ -1,7 +1,7 @@
 // src/_types/reality/admin/planFeatures.ts
 
 export interface PlanFeatureData {
-  id: number;
+  ID: number;
   name: string;
   title: string;
   description: string;

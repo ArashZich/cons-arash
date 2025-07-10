@@ -67,7 +67,12 @@ export default function PlanFeaturesTable() {
   const [selectedFeature, setSelectedFeature] = useState<PlanFeatureData | null>(null);
 
   // API hooks
-  const { data: featuresData, isLoading: featuresLoading, refetch } = usePlanFeaturesQuery();
+  const {
+    data: featuresData,
+    isLoading: featuresLoading,
+    isSuccess,
+    refetch,
+  } = usePlanFeaturesQuery();
 
   const { mutateAsync: deleteFeature, isLoading: deleteLoading } = useDeletePlanFeatureMutation();
 
@@ -125,7 +130,7 @@ export default function PlanFeaturesTable() {
 
   // Update table data when API data changes
   useEffect(() => {
-    if (featuresData?.success && featuresData.data) {
+    if (isSuccess && featuresData.data) {
       setTableData(featuresData.data);
     }
   }, [featuresData]);
@@ -152,7 +157,7 @@ export default function PlanFeaturesTable() {
             onSelectAllRows={(checked) =>
               table.onSelectAllRows(
                 checked,
-                tableData.map((row) => row.id.toString())
+                tableData.map((row) => row.ID.toString())
               )
             }
             action={
@@ -179,7 +184,7 @@ export default function PlanFeaturesTable() {
                 onSelectAllRows={(checked) =>
                   table.onSelectAllRows(
                     checked,
-                    tableData.map((row) => row.id.toString())
+                    tableData.map((row) => row.ID.toString())
                   )
                 }
               />
@@ -193,11 +198,11 @@ export default function PlanFeaturesTable() {
                   <>
                     {dataInPage.map((row) => (
                       <PlanFeatureTableRow
-                        key={row.id}
+                        key={row.ID}
                         row={row}
-                        selected={table.selected.includes(row.id.toString())}
-                        onSelectRow={() => table.onSelectRow(row.id.toString())}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
+                        selected={table.selected.includes(row.ID.toString())}
+                        onSelectRow={() => table.onSelectRow(row.ID.toString())}
+                        onDeleteRow={() => handleDeleteRow(row.ID)}
                         onEditRow={() => handleEditRow(row)}
                       />
                     ))}

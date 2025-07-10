@@ -24,7 +24,7 @@ import Iconify from 'src/components/iconify';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 // utils
-import { fDate } from 'src/utils/format-time';
+import { fDate, jfDate } from 'src/utils/format-time';
 
 // ----------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ export default function DiscountRuleTableRow({
   onSelectRow,
   onDeleteRow,
 }: Props) {
-  const { t } = useLocales();
+  const { t, isRtl } = useLocales();
 
   const {
     name,
@@ -123,7 +123,7 @@ export default function DiscountRuleTableRow({
 
         <TableCell>
           <ListItemText
-            primary={fDate(created_at)}
+            primary={isRtl ? jfDate(created_at) : fDate(created_at)}
             primaryTypographyProps={{ typography: 'body2' }}
           />
         </TableCell>

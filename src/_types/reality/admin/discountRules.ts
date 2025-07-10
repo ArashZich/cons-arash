@@ -1,7 +1,7 @@
 // src/_types/reality/admin/discountRules.ts
 
 export interface DiscountRuleData {
-  id: number;
+  ID: number;
   name: string;
   min_months: number;
   min_products: number;

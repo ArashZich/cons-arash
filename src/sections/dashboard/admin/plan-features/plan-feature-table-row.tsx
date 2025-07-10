@@ -74,7 +74,7 @@ export default function PlanFeatureTableRow({
 
         <TableCell>
           <ListItemText
-            primary={name}
+            primary={t(`plan.${name}`)}
             secondary={description}
             primaryTypographyProps={{ typography: 'body2' }}
             secondaryTypographyProps={{

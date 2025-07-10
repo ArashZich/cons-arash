@@ -96,7 +96,7 @@ export default function PlanFeatureNewEditDialog({ open, onClose, currentFeature
     try {
       if (isEdit && currentFeature) {
         await updateFeature({
-          id: currentFeature.id,
+          id: currentFeature.ID,
           data: {
             name: data.name,
             title: data.title,

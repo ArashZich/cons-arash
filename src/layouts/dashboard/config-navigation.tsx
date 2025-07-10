@@ -157,7 +157,7 @@ export function useNavData(): { items: NavItem[] }[] {
         },
         // 🆕 Admin Section اضافه شده
         {
-          title: t('admin.admin_panel'),
+          title: t('dashboard.dynamic_plan'),
           path: paths.dashboard.admin.root,
           icon: ICONS.organization_management,
           children: [

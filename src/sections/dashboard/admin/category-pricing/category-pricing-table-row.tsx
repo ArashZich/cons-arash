@@ -71,8 +71,8 @@ export default function CategoryPricingTableRow({
               {category.title.charAt(0).toUpperCase()}
             </Avatar>
             <ListItemText
-              primary={category.title}
-              secondary={`ID: ${category.id}`}
+              primary={t(`category.${category.title}`)}
+              secondary={`ID: ${category.ID}`}
               primaryTypographyProps={{ typography: 'body2', fontWeight: 600 }}
               secondaryTypographyProps={{
                 component: 'span',
@@ -109,7 +109,7 @@ export default function CategoryPricingTableRow({
               label={`${storage_per_product_mb} MB`}
               size="small"
               variant="outlined"
-              color="info"
+              color="primary"
               icon={<Iconify icon="solar:database-bold" />}
             />
             <ListItemText

@@ -175,7 +175,7 @@ export default function CategoryPricingNewEditDialog({ open, onClose, currentPri
                       >
                         {category.title.charAt(0).toUpperCase()}
                       </Avatar>
-                      <Typography variant="body2">{category.title}</Typography>
+                      <Typography variant="body2">{t(`category.${category.title}`)}</Typography>
                     </Stack>
                   </MenuItem>
                 ))}
@@ -201,7 +201,9 @@ export default function CategoryPricingNewEditDialog({ open, onClose, currentPri
                       {selectedCategory.title.charAt(0).toUpperCase()}
                     </Avatar>
                     <Stack>
-                      <Typography variant="subtitle2">{selectedCategory.title}</Typography>
+                      <Typography variant="subtitle2">
+                        {t(`category.${selectedCategory.title}`)}
+                      </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {t('admin.category_id')}: {selectedCategory.ID}
                       </Typography>

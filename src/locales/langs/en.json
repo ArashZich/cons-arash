@@ -86,7 +86,8 @@
     "blog": "Blog",
     "edit": "Edit",
     "details": "Details",
-    "coupon": "Coupon"
+    "coupon": "Coupon",
+    "dynamic_plan": "Dynamic Plan"
   },
   "organization": {
     "welcome": "Welcome",
@@ -247,7 +248,9 @@
     "premium_support": "Premium Support",
     "dynamic": "Dynamic",
     "dynamic_plan": "Dynamic Plan",
-    "unknown": "Unknown Plan"
+    "unknown": "Unknown Plan",
+    "remove_watermark": "Remove Watermark",
+    "showroom_builder": "Showroom Builder"
   },
   "project": {
     "new_project": "New Project",

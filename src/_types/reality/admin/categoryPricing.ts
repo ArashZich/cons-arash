@@ -1,12 +1,12 @@
 // src/_types/reality/admin/categoryPricing.ts
 
 export interface CategoryPricingData {
-  id: number;
+  ID: number;
   category_id: number;
   price_per_product_per_month: number;
   storage_per_product_mb: number; // 🆕 اضافه شده
   category: {
-    id: number;
+    ID: number;
     title: string;
     icon_url: string;
   };
