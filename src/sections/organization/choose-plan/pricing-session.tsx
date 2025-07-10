@@ -162,7 +162,7 @@ export default function PricingSession({
 
     try {
       const { data: url } = await buyDynamic({
-        category_id: parseInt(categoryId),
+        category_id: parseInt(categoryId, 10), // ✅ اضافه کردن radix
         months: dynamicPlanParams.months,
         product_count: dynamicPlanParams.product_count,
         feature_ids: dynamicPlanParams.feature_ids,
@@ -194,7 +194,7 @@ export default function PricingSession({
         {/* Dynamic Plan Card */}
         <Grid item xs={12} sm={12} md={12} lg={12}>
           <DynamicPlanCard
-            categoryId={parseInt(categoryId)}
+            categoryId={parseInt(categoryId, 10)} // ✅ اضافه کردن radix
             onBuy={handleDynamicBuy}
             loading={buyDynamicLoading}
           />

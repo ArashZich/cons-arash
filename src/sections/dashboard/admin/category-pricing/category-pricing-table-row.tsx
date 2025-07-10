@@ -45,14 +45,7 @@ export default function CategoryPricingTableRow({
 }: Props) {
   const { t, currentLang } = useLocales();
 
-  const {
-    id,
-    category_id,
-    price_per_product_per_month,
-    storage_per_product_mb,
-    category,
-    created_at,
-  } = row;
+  const { price_per_product_per_month, storage_per_product_mb, category, created_at } = row;
 
   const confirm = useBoolean();
 
@@ -109,7 +102,7 @@ export default function CategoryPricingTableRow({
           </Stack>
         </TableCell>
 
-        {/* 🆕 Storage Column */}
+        {/* Storage Column */}
         <TableCell>
           <Stack direction="row" alignItems="center" spacing={1}>
             <Chip

@@ -90,6 +90,13 @@ export const paths = {
       details: (title: string) => `${ROOTS.DASHBOARD}/post/${paramCase(title)}`,
       edit: (title: string) => `${ROOTS.DASHBOARD}/post/${paramCase(title)}/edit`,
     },
+    // 🆕 Admin section اضافه شده
+    admin: {
+      root: `${ROOTS.DASHBOARD}/admin`,
+      discount_rules: `${ROOTS.DASHBOARD}/admin/discount-rules`,
+      plan_features: `${ROOTS.DASHBOARD}/admin/plan-features`,
+      category_pricing: `${ROOTS.DASHBOARD}/admin/category-pricing`,
+    },
   },
   // ORGANIZATION
   organization: {

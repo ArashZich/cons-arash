@@ -1,6 +1,6 @@
 // src/sections/organization/choose-plan/dynamic-plan-card.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 // @mui
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -72,7 +72,7 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
     );
   };
 
-  const handleCalculatePrice = async () => {
+  const handleCalculatePrice = useCallback(async () => {
     try {
       console.log('🔄 Calculating price...', {
         category_id: categoryId,
@@ -102,7 +102,7 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
         variant: 'error',
       });
     }
-  };
+  }, [categoryId, months, productCount, selectedFeatures, calculatePrice, enqueueSnackbar, t]);
 
   const handleBuyClick = () => {
     if (calculatedPricing) {
@@ -122,7 +122,7 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [months, productCount, selectedFeatures, categoryId]);
+  }, [handleCalculatePrice]);
 
   const renderHeader = (
     <Stack spacing={2}>

@@ -32,22 +32,29 @@ type Props = {
   id: string;
 };
 
-const initialState = {
+const initialState: State = {
   days: 90,
   voucher_code: '',
   is_coupon_enabled: false,
   plan_items: [],
 };
 
-function reducer(state: State, action: Action): State {
+function reducer(draft: State, action: Action): void {
   switch (action.type) {
     case 'days':
+      draft.days = action.payload;
+      break;
     case 'voucher_code':
+      draft.voucher_code = action.payload;
+      break;
     case 'is_coupon_enabled':
+      draft.is_coupon_enabled = action.payload;
+      break;
     case 'plan_items':
-      return { ...state, [action.type]: action.payload };
+      draft.plan_items = action.payload;
+      break;
     default:
-      return state;
+      break;
   }
 }
 
@@ -90,13 +97,9 @@ function ChoosePackageView({ id }: Props) {
     dispatch({ type: 'voucher_code', payload: e.target.value });
   };
 
-  // console.log(planData);
-
   const handleCoupon = () => {
     dispatch({ type: 'is_coupon_enabled', payload: true });
   };
-
-  // console.log(voucherData?.data);
 
   const handleCheckVoucher = () => {
     if (state.is_coupon_enabled) {
@@ -116,12 +119,13 @@ function ChoosePackageView({ id }: Props) {
     if (isSuccessCoupon) {
       const planIds = planData?.data?.items.map((item) => item.ID) || [];
       const isPlanIdValid = planIds.includes(voucherData?.data?.items[0]?.plan_id);
+
       if (!voucherData?.data?.items[0]?.plan_id) {
         const planPrices = planData?.data?.items || [];
         const discountAmount = voucherData?.data?.items[0]?.discounting_amount || 0;
         const maximumDiscountAmount = voucherData?.data?.items[0]?.maximum_discount_amount || 0;
 
-        const updatedPlanItems = planPrices.map((item, index) => {
+        const updatedPlanItems = planPrices.map((item) => {
           // discountAmount is percent
           const discountValue = (item.price * discountAmount) / 100;
           const effectiveDiscount = Math.min(discountValue, maximumDiscountAmount);
@@ -137,30 +141,31 @@ function ChoosePackageView({ id }: Props) {
         });
         dispatch({ type: 'plan_items', payload: updatedPlanItems });
       } else if (!isPlanIdValid) {
-        dispatch({ type: 'plan_items', payload: planData?.data?.items });
+        dispatch({ type: 'plan_items', payload: planData?.data?.items || [] });
         enqueueSnackbar(t('organization.voucher_code_not_valid'), { variant: 'error' });
       } else if (isPlanIdValid) {
         const voucherPlanId = voucherData?.data?.items[0]?.plan_id;
         const discountAmount = voucherData?.data?.items[0]?.discounting_amount || 0;
         const maximumDiscountAmount = voucherData?.data?.items[0]?.maximum_discount_amount || 0;
 
-        const updatedPlanItems = planData?.data?.items.map((item) => {
-          if (item.ID === voucherPlanId) {
-            // discountAmount is percent
-            const discountValue = (item.price * discountAmount) / 100;
-            const effectiveDiscount = Math.min(discountValue, maximumDiscountAmount);
-            // Apply discountAmount to the price
-            const discountedPrice = item.price - effectiveDiscount;
+        const updatedPlanItems =
+          planData?.data?.items.map((item) => {
+            if (item.ID === voucherPlanId) {
+              // discountAmount is percent
+              const discountValue = (item.price * discountAmount) / 100;
+              const effectiveDiscount = Math.min(discountValue, maximumDiscountAmount);
+              // Apply discountAmount to the price
+              const discountedPrice = item.price - effectiveDiscount;
 
-            // Create a new object with the updated price
-            return {
-              ...item,
-              price_discounted: discountedPrice,
-              discount_code: voucherData?.data?.items[0].code,
-            };
-          }
-          return item;
-        });
+              // Create a new object with the updated price
+              return {
+                ...item,
+                price_discounted: discountedPrice,
+                discount_code: voucherData?.data?.items[0].code,
+              };
+            }
+            return item;
+          }) || [];
 
         dispatch({ type: 'plan_items', payload: updatedPlanItems });
       }
@@ -229,7 +234,7 @@ function ChoosePackageView({ id }: Props) {
           discountAmount={voucherData?.data?.items[0]?.discounting_amount || 0}
           maximumDiscountAmount={voucherData?.data?.items[0]?.maximum_discount_amount || 0}
         />
-      )}{' '}
+      )}
     </Stack>
   );
 }

@@ -46,7 +46,6 @@ export default function DiscountRuleTableRow({
   const { t } = useLocales();
 
   const {
-    id,
     name,
     min_months,
     min_products,

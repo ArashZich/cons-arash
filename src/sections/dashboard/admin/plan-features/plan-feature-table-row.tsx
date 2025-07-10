@@ -2,7 +2,6 @@
 
 // @mui
 import Button from '@mui/material/Button';
-import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
@@ -45,7 +44,7 @@ export default function PlanFeatureTableRow({
 }: Props) {
   const { t, currentLang } = useLocales();
 
-  const { id, name, title, description, pricing_type, price, category_ids, is_active } = row;
+  const { name, title, description, pricing_type, price, category_ids, is_active } = row;
 
   const confirm = useBoolean();
 

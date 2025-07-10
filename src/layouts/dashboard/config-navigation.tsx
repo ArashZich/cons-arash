@@ -94,6 +94,7 @@ export function useNavData(): { items: NavItem[] }[] {
       },
       // Additional items...
     ];
+
     if (user?.roles?.some((role) => role.title.toLocaleLowerCase() === 'admin')) {
       items.push({
         title: t('dashboard.user_information'),
@@ -152,6 +153,26 @@ export function useNavData(): { items: NavItem[] }[] {
             { title: t('dashboard.list'), path: paths.dashboard.plan_management.root },
             { title: t('dashboard.create'), path: paths.dashboard.plan_management.new },
             // Additional children...
+          ],
+        },
+        // 🆕 Admin Section اضافه شده
+        {
+          title: t('admin.admin_panel'),
+          path: paths.dashboard.admin.root,
+          icon: ICONS.organization_management,
+          children: [
+            {
+              title: t('admin.discount_rules_management'),
+              path: paths.dashboard.admin.discount_rules,
+            },
+            {
+              title: t('admin.plan_features_management'),
+              path: paths.dashboard.admin.plan_features,
+            },
+            {
+              title: t('admin.category_pricing_management'),
+              path: paths.dashboard.admin.category_pricing,
+            },
           ],
         }
       );
