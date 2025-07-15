@@ -87,7 +87,7 @@
     "edit": "ویرایش",
     "details": "جزئیات",
     "coupon": "کد تخفیف",
-    "dynamic_plan": "بسته‌های داینامیک"
+    "dynamic_plan": "بسته‌های شخصی"
   },
   "organization": {
     "welcome": "خوش آمدید",
@@ -141,7 +141,7 @@
     "total_discount": "مجموع تخفیف",
     "price_after_discount": "قیمت پس از تخفیف",
     "final_price": "قیمت نهایی",
-    "dynamic_plan": "پلن داینامیک",
+    "dynamic_plan": "پلن شخصی",
     "customize_your_plan": "پلن خود را سفارشی کنید",
     "duration_months": "مدت زمان (ماه)",
     "product_count": "تعداد محصولات",
@@ -151,7 +151,7 @@
     "auto_discount": "تخفیف خودکار",
     "calculating": "در حال محاسبه...",
     "calculation_error": "خطا در محاسبه قیمت",
-    "buy_dynamic_plan": "خرید پلن داینامیک",
+    "buy_dynamic_plan": "خرید پلن شخصی",
     "plan_configuration": "تنظیمات پلن",
     "category": "دسته‌بندی",
     "duration": "مدت زمان",
@@ -160,7 +160,8 @@
     "months": "ماه",
     "selected_features": "امکانات انتخاب شده",
     "subtotal": "جمع کل",
-    "proceed_to_payment": "ادامه پرداخت"
+    "proceed_to_payment": "ادامه پرداخت",
+    "or_choose_ready_plan": "یا پلن آماده انتخاب کنید"
   },
   "category": {
     "home_kitchen": "خانه و آشپزخانه",
@@ -245,8 +246,8 @@
     "custom_domain": "لینک اختصاصی",
     "ai_assistant": "دستیار هوش مصنوعی",
     "premium_support": "پشتیبانی VIP",
-    "dynamic": "داینامیک",
-    "dynamic_plan": "پلن داینامیک",
+    "dynamic": "شخصی",
+    "dynamic_plan": "پلن شخصی",
     "unknown": "پلن نامشخص",
     "remove_watermark": "حذف واترمارک",
     "showroom_builder": "ساختن شوروم"

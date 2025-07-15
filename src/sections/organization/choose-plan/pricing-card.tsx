@@ -98,23 +98,6 @@ export default function PricingCard(props: PlanPackageProps) {
             <Typography variant="h4" color="success.main">
               {formatPrice(data?.price_discounted)}
             </Typography>
-            <Stack
-              direction="row"
-              alignItems="center"
-              sx={{
-                bgcolor: 'success.lighter',
-                color: 'success.dark',
-                px: 1,
-                py: 0.25,
-                borderRadius: 0.75,
-                fontSize: '0.7rem',
-              }}
-            >
-              <Iconify icon="solar:check-circle-bold" width={12} sx={{ mr: 0.25 }} />
-              <Typography variant="caption" fontWeight={600} fontSize="0.7rem">
-                {t('organization.voucher_applied')}
-              </Typography>
-            </Stack>
           </Stack>
         )}
 

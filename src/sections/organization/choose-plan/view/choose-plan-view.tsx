@@ -109,6 +109,30 @@ function ChoosePackageView({ id }: Props) {
     }
   };
 
+  // تابع کمکی برای محاسبه صحیح تخفیف
+  const calculateDiscountedPrice = (
+    item: any,
+    discountAmount: number,
+    maximumDiscountAmount: number
+  ) => {
+    // 🔥 تعیین قیمت پایه: اگر discounted_price وجود داره و کمتر از price هست، از اون استفاده کن
+    const basePrice =
+      item.discounted_price && item.discounted_price < item.price
+        ? item.discounted_price
+        : item.price;
+
+    // محاسبه تخفیف بر اساس درصد
+    const discountValue = (basePrice * discountAmount) / 100;
+
+    // اعمال حداکثر مقدار تخفیف
+    const effectiveDiscount = Math.min(discountValue, maximumDiscountAmount);
+
+    // قیمت نهایی
+    const finalDiscountedPrice = basePrice - effectiveDiscount;
+
+    return finalDiscountedPrice;
+  };
+
   useEffect(() => {
     if (isSuccess) {
       dispatch({ type: 'plan_items', payload: planData.data.items });
@@ -121,29 +145,33 @@ function ChoosePackageView({ id }: Props) {
       const isPlanIdValid = planIds.includes(voucherData?.data?.items[0]?.plan_id);
 
       if (!voucherData?.data?.items[0]?.plan_id) {
+        // 🔥 کد تخفیف برای همه پلن‌ها اعمال میشه
         const planPrices = planData?.data?.items || [];
         const discountAmount = voucherData?.data?.items[0]?.discounting_amount || 0;
         const maximumDiscountAmount = voucherData?.data?.items[0]?.maximum_discount_amount || 0;
 
         const updatedPlanItems = planPrices.map((item) => {
-          // discountAmount is percent
-          const discountValue = (item.price * discountAmount) / 100;
-          const effectiveDiscount = Math.min(discountValue, maximumDiscountAmount);
-          // Apply discountAmount to the price
-          const discountedPrice = item.price - effectiveDiscount;
+          // 🔥 استفاده از تابع اصلاح شده
+          const finalDiscountedPrice = calculateDiscountedPrice(
+            item,
+            discountAmount,
+            maximumDiscountAmount
+          );
 
-          // Create a new object with the updated price
           return {
             ...item,
-            price_discounted: discountedPrice,
+            price_discounted: finalDiscountedPrice,
             discount_code: voucherData?.data?.items[0]?.code,
           };
         });
+
         dispatch({ type: 'plan_items', payload: updatedPlanItems });
       } else if (!isPlanIdValid) {
+        // کد تخفیف برای این پلن‌ها معتبر نیست
         dispatch({ type: 'plan_items', payload: planData?.data?.items || [] });
         enqueueSnackbar(t('organization.voucher_code_not_valid'), { variant: 'error' });
       } else if (isPlanIdValid) {
+        // 🔥 کد تخفیف فقط برای یک پلن خاص اعمال میشه
         const voucherPlanId = voucherData?.data?.items[0]?.plan_id;
         const discountAmount = voucherData?.data?.items[0]?.discounting_amount || 0;
         const maximumDiscountAmount = voucherData?.data?.items[0]?.maximum_discount_amount || 0;
@@ -151,16 +179,16 @@ function ChoosePackageView({ id }: Props) {
         const updatedPlanItems =
           planData?.data?.items.map((item) => {
             if (item.ID === voucherPlanId) {
-              // discountAmount is percent
-              const discountValue = (item.price * discountAmount) / 100;
-              const effectiveDiscount = Math.min(discountValue, maximumDiscountAmount);
-              // Apply discountAmount to the price
-              const discountedPrice = item.price - effectiveDiscount;
+              // 🔥 استفاده از تابع اصلاح شده
+              const finalDiscountedPrice = calculateDiscountedPrice(
+                item,
+                discountAmount,
+                maximumDiscountAmount
+              );
 
-              // Create a new object with the updated price
               return {
                 ...item,
-                price_discounted: discountedPrice,
+                price_discounted: finalDiscountedPrice,
                 discount_code: voucherData?.data?.items[0].code,
               };
             }
