@@ -133,7 +133,7 @@ export default function PlanFeaturesTable() {
     if (isSuccess && featuresData.data) {
       setTableData(featuresData.data);
     }
-  }, [featuresData]);
+  }, [featuresData, isSuccess]);
 
   return (
     <>

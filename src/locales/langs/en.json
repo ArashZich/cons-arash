@@ -162,7 +162,9 @@
     "selected_features": "Selected Features",
     "subtotal": "Subtotal",
     "proceed_to_payment": "Proceed to Payment",
-    "or_choose_ready_plan": "or choose a ready plan"
+    "or_choose_ready_plan": "or choose a ready plan",
+    "static_plans": "Static Plans",
+    "pcs": "pcs"
   },
   "category": {
     "home_kitchen": "Home and Kitchen",

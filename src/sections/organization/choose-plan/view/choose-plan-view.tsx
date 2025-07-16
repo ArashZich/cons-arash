@@ -3,14 +3,11 @@
 // react
 import React, { useEffect } from 'react';
 // @mui
-import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 
 // lodash
-import { toInteger, isEmpty } from 'lodash';
+import { toInteger } from 'lodash';
 // immer
 import { useImmerReducer } from 'use-immer';
 // locales
@@ -23,8 +20,6 @@ import { State, Action } from 'src/_types/sections/organization/choose-plan';
 import { FilterOperatorsEnum } from 'src/_types/site/filters';
 // components
 import { useSnackbar } from 'src/components/snackbar';
-// constants
-import { data_length } from 'src/constants';
 //
 import PricingSession from '../pricing-session';
 
@@ -92,9 +87,9 @@ function ChoosePackageView({ id }: Props) {
     dispatch({ type: 'days', payload: days });
   };
 
-  const handleVoucherCode = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVoucherCode = (code: string) => {
     dispatch({ type: 'is_coupon_enabled', payload: false });
-    dispatch({ type: 'voucher_code', payload: e.target.value });
+    dispatch({ type: 'voucher_code', payload: code });
   };
 
   const handleCoupon = () => {
@@ -115,7 +110,7 @@ function ChoosePackageView({ id }: Props) {
     discountAmount: number,
     maximumDiscountAmount: number
   ) => {
-    // 🔥 تعیین قیمت پایه: اگر discounted_price وجود داره و کمتر از price هست، از اون استفاده کن
+    // تعیین قیمت پایه: اگر discounted_price وجود داره و کمتر از price هست، از اون استفاده کن
     const basePrice =
       item.discounted_price && item.discounted_price < item.price
         ? item.discounted_price
@@ -145,13 +140,13 @@ function ChoosePackageView({ id }: Props) {
       const isPlanIdValid = planIds.includes(voucherData?.data?.items[0]?.plan_id);
 
       if (!voucherData?.data?.items[0]?.plan_id) {
-        // 🔥 کد تخفیف برای همه پلن‌ها اعمال میشه
+        // کد تخفیف برای همه پلن‌ها اعمال میشه
         const planPrices = planData?.data?.items || [];
         const discountAmount = voucherData?.data?.items[0]?.discounting_amount || 0;
         const maximumDiscountAmount = voucherData?.data?.items[0]?.maximum_discount_amount || 0;
 
         const updatedPlanItems = planPrices.map((item) => {
-          // 🔥 استفاده از تابع اصلاح شده
+          // استفاده از تابع اصلاح شده
           const finalDiscountedPrice = calculateDiscountedPrice(
             item,
             discountAmount,
@@ -171,7 +166,7 @@ function ChoosePackageView({ id }: Props) {
         dispatch({ type: 'plan_items', payload: planData?.data?.items || [] });
         enqueueSnackbar(t('organization.voucher_code_not_valid'), { variant: 'error' });
       } else if (isPlanIdValid) {
-        // 🔥 کد تخفیف فقط برای یک پلن خاص اعمال میشه
+        // کد تخفیف فقط برای یک پلن خاص اعمال میشه
         const voucherPlanId = voucherData?.data?.items[0]?.plan_id;
         const discountAmount = voucherData?.data?.items[0]?.discounting_amount || 0;
         const maximumDiscountAmount = voucherData?.data?.items[0]?.maximum_discount_amount || 0;
@@ -179,7 +174,7 @@ function ChoosePackageView({ id }: Props) {
         const updatedPlanItems =
           planData?.data?.items.map((item) => {
             if (item.ID === voucherPlanId) {
-              // 🔥 استفاده از تابع اصلاح شده
+              // استفاده از تابع اصلاح شده
               const finalDiscountedPrice = calculateDiscountedPrice(
                 item,
                 discountAmount,
@@ -221,39 +216,7 @@ function ChoosePackageView({ id }: Props) {
       >
         {t('organization.select_the_package')}
       </Typography>
-      <Stack
-        flexDirection="row"
-        alignItems="center"
-        justifyContent="center"
-        spacing={1}
-        marginTop={3}
-      >
-        {data_length.map((item, ind) => (
-          <Chip
-            key={ind}
-            label={t(`organization.${item.label}`)}
-            variant={state.days === item.value ? 'filled' : 'outlined'}
-            onClick={() => handleDays(item.value)}
-          />
-        ))}
-      </Stack>
-      <Stack flexDirection="row" justifyContent="center" marginTop={5} spacing={1}>
-        <TextField
-          variant="outlined"
-          placeholder={t('organization.voucher_code')}
-          size="medium"
-          onChange={handleVoucherCode}
-          value={state.voucher_code}
-        />
-        <Button
-          variant="contained"
-          disabled={isEmpty(state.voucher_code)}
-          size="medium"
-          onClick={handleCheckVoucher}
-        >
-          {t('organization.apply')}
-        </Button>
-      </Stack>
+
       {isSuccess && (
         <PricingSession
           data={state.plan_items}
@@ -261,6 +224,10 @@ function ChoosePackageView({ id }: Props) {
           discountCode={state.voucher_code}
           discountAmount={voucherData?.data?.items[0]?.discounting_amount || 0}
           maximumDiscountAmount={voucherData?.data?.items[0]?.maximum_discount_amount || 0}
+          onVoucherChange={handleVoucherCode}
+          onDaysChange={handleDays}
+          onApplyCoupon={handleCheckVoucher}
+          currentDays={state.days}
         />
       )}
     </Stack>

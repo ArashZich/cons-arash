@@ -132,7 +132,7 @@ export default function CategoryPricingTable() {
     if (isSuccess && pricingData.data) {
       setTableData(pricingData.data);
     }
-  }, [pricingData]);
+  }, [pricingData, isSuccess]);
 
   return (
     <>

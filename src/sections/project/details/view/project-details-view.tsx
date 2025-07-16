@@ -32,8 +32,6 @@ export default function ProjectDetailsView({ uid }: Props) {
     },
   });
 
-  // console.log(currentProducts);
-
   return (
     <Stack
       maxWidth={1440}

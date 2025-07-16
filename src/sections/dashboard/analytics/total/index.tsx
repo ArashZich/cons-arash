@@ -40,8 +40,6 @@ function TotalView({ organization_id }: Props) {
 
   const [durationData, setDurationData] = useState<DurationType>('one_week');
 
-  // console.log(organization_id, 'organization_id');
-
   const { data: viewData, isSuccess } = useViewsQuery({
     order: 'asc',
     duration: durationData,

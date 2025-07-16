@@ -57,10 +57,6 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
     { enabled: !!categoryId }
   );
 
-  // Debug features data
-  console.log('🎯 Features data:', featuresData);
-  console.log('🏷️ Category ID:', categoryId);
-
   // Calculate price mutation
   const { mutateAsync: calculatePrice, isLoading: calculating } = useCalculatePriceMutation();
 
@@ -74,21 +70,12 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
 
   const handleCalculatePrice = useCallback(async () => {
     try {
-      console.log('🔄 Calculating price...', {
-        category_id: categoryId,
-        months,
-        product_count: productCount,
-        feature_ids: selectedFeatures,
-      });
-
       const response = await calculatePrice({
         category_id: categoryId,
         months,
         product_count: productCount,
         feature_ids: selectedFeatures,
       });
-
-      console.log('💰 Price response:', response);
 
       if (response?.data) {
         setCalculatedPricing(response.data);
@@ -163,7 +150,7 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
       {/* Product Count Selector */}
       <Stack spacing={2}>
         <Typography variant="subtitle2">
-          {t('organization.product_count')} ({productCount} {t('organization.products')})
+          {t('organization.product_count')} ({productCount} {t('organization.pcs')})
         </Typography>
         <Box px={1}>
           <Slider
@@ -212,7 +199,7 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
                     <Stack direction="row" alignItems="center" spacing={1} sx={{ flex: 1 }}>
                       <Typography variant="body2">{feature.title}</Typography>
                       <Chip
-                        label={formatPrice(feature.price)}
+                        label={`${formatPrice(feature.price)}  ${t('organization.toman')}`}
                         size="small"
                         variant="outlined"
                         color="secondary"
@@ -263,12 +250,28 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
           {calculatedPricing.discounts.auto_discount &&
             calculatedPricing.discounts.auto_discount.total_discount > 0 && (
               <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="success.main">
-                  {t('organization.auto_discount')} (
-                  {calculatedPricing.discounts.auto_discount.percentage}%)
-                </Typography>
-                <Typography variant="body2" color="success.main" fontWeight={600}>
-                  -{formatPrice(calculatedPricing.discounts.auto_discount.total_discount)}
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  sx={{
+                    bgcolor: 'error.lighter',
+                    color: 'error.dark',
+                    px: 1,
+                    py: 0.5,
+                    borderRadius: 1,
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  <Iconify icon="solar:tag-bold" width={14} sx={{ mr: 0.5 }} />
+                  <Typography variant="caption" fontWeight={600}>
+                    {t('organization.auto_discount')} (
+                    {calculatedPricing.discounts.auto_discount.percentage}%)
+                  </Typography>
+                </Stack>
+
+                <Typography variant="body2" color="error.dark" fontWeight={600}>
+                  {formatPrice(calculatedPricing.discounts.auto_discount.total_discount)}-
                 </Typography>
               </Stack>
             )}
@@ -276,7 +279,7 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
           <Divider />
 
           {/* Final Price */}
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack direction="row" alignItems="center" justifyContent="end" spacing={1}>
             <Stack>
               <Typography variant="h4" color="secondary.main" fontWeight={700}>
                 {formatPrice(calculatedPricing.summary.final_price)}
@@ -304,13 +307,6 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
   // Check if buy button should be enabled
   const isBuyButtonEnabled = !calculating && !!calculatedPricing && !loading;
 
-  console.log('🔘 Buy button state:', {
-    calculating,
-    calculatedPricing: !!calculatedPricing,
-    loading,
-    isBuyButtonEnabled,
-  });
-
   return (
     <Card
       sx={{
@@ -335,13 +331,7 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
           onClick={handleBuyClick}
           disabled={!isBuyButtonEnabled}
           sx={{ mt: 'auto' }}
-          startIcon={
-            loading ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              <Iconify icon="solar:cart-plus-bold" />
-            )
-          }
+          startIcon={loading && <CircularProgress size={20} color="inherit" />}
         >
           {t('organization.buy_dynamic_plan')}
         </Button>

@@ -99,7 +99,7 @@ export default function DiscountRuleNewEditDialog({ open, onClose, currentRule }
     try {
       if (isEdit && currentRule) {
         await updateRule({
-          id: currentRule.id,
+          id: currentRule.ID,
           data: {
             name: data.name,
             min_months: data.min_months,

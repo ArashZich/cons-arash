@@ -132,7 +132,7 @@ export default function DiscountRulesTable() {
     if (rulesSuccess && rulesData.data) {
       setTableData(rulesData.data);
     }
-  }, [rulesData]);
+  }, [rulesData, rulesSuccess]);
 
   return (
     <>

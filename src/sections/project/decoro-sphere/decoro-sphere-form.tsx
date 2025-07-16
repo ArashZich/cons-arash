@@ -237,15 +237,6 @@ function DecoroSphereFrom() {
         length = sizeList[1];
         tiles = sizeList[2] || '';
       }
-      // console.log(width, length, tiles, values.isCircle, values.isTile, values.files);
-      // console.log(
-      //   tiles,
-      //   'tiles',
-      //   values.isTile,
-      //   'isTile',
-      //   category_wall_or_flooring(categoryName),
-      //   'isWall'
-      // );
 
       await uploadImageToGlbToUsdz({
         files: values.files,

@@ -136,8 +136,6 @@ function ShowroomUploader() {
       organization_id: organizationId,
     }));
 
-    // console.log(documents, 'DOCUMENTS');
-
     const values = {
       name: projectName,
       thumbnail_uri: previewUri,
@@ -263,8 +261,6 @@ function ShowroomUploader() {
 
       const newFile = acceptedFiles[0];
       const sizeInMB = newFile.size / (1024 * 1024);
-
-      // console.log(newFile.size, sizeInMB, 'LLLLLLL');
 
       if (newFile) {
         setModelFile(
