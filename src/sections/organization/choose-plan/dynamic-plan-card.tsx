@@ -287,18 +287,6 @@ export default function DynamicPlanCard({ categoryId, onBuy, loading }: DynamicP
             </Stack>
             <Typography variant="h6">{t('organization.toman')}</Typography>
           </Stack>
-
-          {/* Savings */}
-          {calculatedPricing.summary.auto_discount > 0 && (
-            <Stack alignItems="center">
-              <Chip
-                label={calculatedPricing.summary.savings}
-                color="success"
-                size="small"
-                icon={<Iconify icon="solar:tag-bold" />}
-              />
-            </Stack>
-          )}
         </>
       )}
     </Stack>

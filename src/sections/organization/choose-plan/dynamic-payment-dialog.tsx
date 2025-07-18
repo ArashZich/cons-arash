@@ -43,6 +43,11 @@ export default function DynamicPaymentDialog({
 
   const formatPrice = (price: number) => fPriceLocale(price, currentLang.value);
 
+  // محاسبه 10% ارزش افزوده (فقط برای نمایش)
+  const VAT_RATE = 0.1;
+  const vatAmount = Math.round(pricing.summary.final_price * VAT_RATE);
+  const finalPriceWithVAT = pricing.summary.final_price + vatAmount;
+
   const renderHeader = (
     <Stack direction="row-reverse" justifyContent="space-between" alignItems="center">
       <IconButton onClick={onClose}>
@@ -153,45 +158,61 @@ export default function DynamicPaymentDialog({
         </Typography>
         <Typography variant="body1">{t('organization.subtotal')}</Typography>
       </Stack>
-
       {/* Auto Discount */}
       {pricing.discounts.auto_discount && pricing.discounts.auto_discount.total_discount > 0 && (
-        <Stack direction="row-reverse" justifyContent="space-between" alignItems="center">
-          <Typography variant="body2" color="success.main" fontWeight={600}>
-            -{formatPrice(pricing.discounts.auto_discount.total_discount)}
-          </Typography>
-          <Stack>
-            <Typography variant="body2" color="success.main">
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack
+            direction="row"
+            alignItems="center"
+            sx={{
+              bgcolor: 'error.lighter',
+              color: 'error.dark',
+              px: 1,
+              py: 0.5,
+              borderRadius: 1,
+              fontSize: '0.75rem',
+              fontWeight: 600,
+            }}
+          >
+            <Iconify icon="solar:tag-bold" width={14} sx={{ mr: 0.5 }} />
+            <Typography variant="caption" fontWeight={600}>
               {t('organization.auto_discount')} ({pricing.discounts.auto_discount.percentage}%)
             </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {pricing.discounts.auto_discount.rule_name}
-            </Typography>
           </Stack>
+
+          <Typography variant="body2" color="error.dark" fontWeight={600}>
+            {formatPrice(pricing.discounts.auto_discount.total_discount)}-
+          </Typography>
         </Stack>
       )}
 
       <Divider sx={{ borderStyle: 'dashed' }} />
 
-      {/* Final Price */}
+      {/* Price before VAT */}
+      <Stack direction="row-reverse" justifyContent="space-between" alignItems="center">
+        <Typography variant="body1" fontWeight={600}>
+          {formatPrice(pricing.summary.final_price)}
+        </Typography>
+        <Typography variant="body1">{t('organization.price_before_vat')}</Typography>
+      </Stack>
+
+      {/* VAT (10%) */}
+      <Stack direction="row-reverse" justifyContent="space-between" alignItems="center">
+        <Typography variant="body2" fontWeight={600}>
+          {formatPrice(vatAmount)}
+        </Typography>
+        <Typography variant="body2">{t('organization.vat')} (10%)</Typography>
+      </Stack>
+
+      <Divider />
+
+      {/* Final Price with VAT */}
       <Stack direction="row-reverse" justifyContent="space-between" alignItems="center">
         <Typography variant="h5" color="primary.main" fontWeight={700}>
-          {formatPrice(pricing.summary.final_price)}
+          {formatPrice(finalPriceWithVAT)}
         </Typography>
         <Typography variant="h6">{t('organization.final_price')}</Typography>
       </Stack>
-
-      {/* Savings Badge */}
-      {pricing.summary.auto_discount > 0 && (
-        <Stack alignItems="center" mt={1}>
-          <Chip
-            label={pricing.summary.savings}
-            color="success"
-            icon={<Iconify icon="solar:tag-bold" />}
-            sx={{ fontWeight: 600 }}
-          />
-        </Stack>
-      )}
     </Stack>
   );
 

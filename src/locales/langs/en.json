@@ -164,7 +164,9 @@
     "proceed_to_payment": "Proceed to Payment",
     "or_choose_ready_plan": "or choose a ready plan",
     "static_plans": "Static Plans",
-    "pcs": "pcs"
+    "pcs": "pcs",
+    "price_before_vat": "Price Before VAT",
+    "vat": "VAT"
   },
   "category": {
     "home_kitchen": "Home and Kitchen",
