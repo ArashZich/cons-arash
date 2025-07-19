@@ -1,5 +1,5 @@
 // react
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 // @mui
 import Typography from '@mui/material/Typography';
 import { experimentalStyled as styled, useTheme, alpha } from '@mui/material/styles';

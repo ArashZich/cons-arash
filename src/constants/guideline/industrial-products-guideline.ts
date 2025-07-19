@@ -150,6 +150,19 @@ export const industrial_products_guideline = {
           ],
         },
         {
+          title: 'دانلود فایل نمونه',
+          type: 'success' as const,
+          content:
+            'برای درک بهتر ساختار مورد انتظار، فایل نمونه مدل سه‌بعدی محصولات صنعتی را دانلود کنید:',
+          items: [
+            {
+              name: 'فایل نمونه GLB - محصولات صنعتی',
+              url: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industry.glb',
+              type: 'download',
+            },
+          ],
+        },
+        {
           title: 'نکات مهم برای محصولات صنعتی:',
           type: 'warning' as const,
           items: [

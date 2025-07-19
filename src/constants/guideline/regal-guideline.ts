@@ -15,17 +15,17 @@ interface GuidelineSection {
   subsections?: GuidelineSection[];
 }
 
-interface GuidelineService {
-  title: string;
-  description: string;
-  features?: string[];
-  image?: string;
-  links?: {
-    text: string;
-    url: string;
-    type: 'button' | 'link';
-  }[];
-}
+// interface GuidelineService {
+//   title: string;
+//   description: string;
+//   features?: string[];
+//   image?: string;
+//   links?: {
+//     text: string;
+//     url: string;
+//     type: 'button' | 'link';
+//   }[];
+// }
 
 interface GuidelineFAQ {
   question: string;
@@ -362,7 +362,7 @@ export const regal_guideline = {
   // Demo Link
   demo_link: {
     text: '🔗 تست نمونه رگال',
-    url: 'https://regal-demo.armogroup.tech/',
+    url: 'https://webar.armogroup.tech/showroom/546e5373-5760-11f0-a535-fe3a0e44f5b8',
     type: 'link' as const,
   },
 

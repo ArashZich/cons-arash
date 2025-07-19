@@ -46,6 +46,9 @@ import {
   regal_guideline,
   industrial_products_guideline,
   home_appliances_guideline,
+  furniture_guideline,
+  wall_products_guideline,
+  vitrine_guideline,
 } from 'src/constants';
 
 // ----------------------------------------------------------------------
@@ -165,7 +168,7 @@ const SectionRenderer = ({ section, level = 0 }: { section: GuidelineSection; le
           </Stack>
         );
 
-      case 'table':
+      case 'table': {
         // Type guard برای بررسی ساختار table
         if (
           !section.items ||
@@ -200,11 +203,12 @@ const SectionRenderer = ({ section, level = 0 }: { section: GuidelineSection; le
             </Table>
           </TableContainer>
         );
+      }
 
       case 'warning':
       case 'error':
       case 'info':
-      case 'success':
+      case 'success': {
         const colors = {
           warning: { bg: 'warning.lighter', color: 'warning.main', icon: '⚠️' },
           error: { bg: 'error.lighter', color: 'error.main', icon: '🚫' },
@@ -241,22 +245,36 @@ const SectionRenderer = ({ section, level = 0 }: { section: GuidelineSection; le
                 {section.items.map((item, index) => (
                   <ListItem key={index}>
                     <ListItemText
-                      primary={
-                        typeof item === 'string' ? (
-                          `• ${item}`
-                        ) : item.url ? (
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => handleLinkClick(item.url)}
-                            startIcon={<Iconify icon="eva:download-fill" />}
-                          >
-                            {item.name}
-                          </Button>
-                        ) : (
-                          `• ${item.name || item.title || item}`
-                        )
-                      }
+                      primary={(() => {
+                        if (typeof item === 'string') return `• ${item}`;
+                        if (item.type === 'download') {
+                          return (
+                            <Button
+                              variant="contained"
+                              size="small"
+                              color="primary"
+                              onClick={() => handleLinkClick(item.url)}
+                              startIcon={<Iconify icon="eva:download-fill" />}
+                              sx={{ mt: 1 }}
+                            >
+                              {item.name}
+                            </Button>
+                          );
+                        }
+                        if (item.url) {
+                          return (
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => handleLinkClick(item.url)}
+                              startIcon={<Iconify icon="eva:external-link-fill" />}
+                            >
+                              {item.name}
+                            </Button>
+                          );
+                        }
+                        return `• ${item.name || item.title || item}`;
+                      })()}
                     />
                   </ListItem>
                 ))}
@@ -264,8 +282,9 @@ const SectionRenderer = ({ section, level = 0 }: { section: GuidelineSection; le
             )}
           </Box>
         );
+      }
 
-      default:
+      default: {
         if (section.items) {
           return (
             <List dense={level > 0}>
@@ -300,6 +319,7 @@ const SectionRenderer = ({ section, level = 0 }: { section: GuidelineSection; le
         }
 
         return section.content ? <Typography variant="body1">{section.content}</Typography> : null;
+      }
     }
   };
 
@@ -326,9 +346,13 @@ const SectionRenderer = ({ section, level = 0 }: { section: GuidelineSection; le
 
 // Component for rendering services
 const ServiceRenderer = ({ service }: { service: GuidelineService }) => {
+  const router = useRouter();
+
   const handleLinkClick = (url: string) => {
     if (url.startsWith('http')) {
       window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      router.push(url);
     }
   };
 
@@ -374,36 +398,34 @@ const ServiceRenderer = ({ service }: { service: GuidelineService }) => {
 };
 
 // Component for key features
-const KeyFeaturesRenderer = ({ keyFeatures }: { keyFeatures: any }) => {
-  return (
-    <Box>
-      <Typography variant="h6" sx={{ mb: 3, color: 'primary.main' }}>
-        {keyFeatures.title}
-      </Typography>
-      <Stack spacing={2}>
-        {keyFeatures.items.map((feature: any, index: number) => (
-          <Card
-            key={index}
-            variant="outlined"
-            sx={{ transition: 'all 0.2s', '&:hover': { boxShadow: 2 } }}
-          >
-            <CardContent>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
-              >
-                {feature.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {feature.description}
-              </Typography>
-            </CardContent>
-          </Card>
-        ))}
-      </Stack>
-    </Box>
-  );
-};
+const KeyFeaturesRenderer = ({ keyFeatures }: { keyFeatures: any }) => (
+  <Box>
+    <Typography variant="h6" sx={{ mb: 3, color: 'primary.main' }}>
+      {keyFeatures.title}
+    </Typography>
+    <Stack spacing={2}>
+      {keyFeatures.items.map((feature: any, index: number) => (
+        <Card
+          key={index}
+          variant="outlined"
+          sx={{ transition: 'all 0.2s', '&:hover': { boxShadow: 2 } }}
+        >
+          <CardContent>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
+            >
+              {feature.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {feature.description}
+            </Typography>
+          </CardContent>
+        </Card>
+      ))}
+    </Stack>
+  </Box>
+);
 
 export default function GuidelineCategoryView({ category }: Props) {
   const settings = useSettingsContext();
@@ -420,6 +442,12 @@ export default function GuidelineCategoryView({ category }: Props) {
         return industrial_products_guideline as BaseGuideline;
       case 'home_appliances':
         return home_appliances_guideline as BaseGuideline;
+      case 'furniture':
+        return furniture_guideline as BaseGuideline;
+      case 'wall_mounted':
+        return wall_products_guideline as BaseGuideline;
+      case 'vitrine':
+        return vitrine_guideline as BaseGuideline;
       default:
         return null;
     }
@@ -446,7 +474,7 @@ export default function GuidelineCategoryView({ category }: Props) {
           sx={{ mb: { xs: 3, md: 5 } }}
         />
         <Typography variant="h4" sx={{ textAlign: 'center' }}>
-          راهنمای این دسته‌بندی در حال حاضر موجود نیست
+          راهنمای این دسته‌بندی به زودی اضافه خواهد شد.
         </Typography>
       </Container>
     );
@@ -574,6 +602,55 @@ export default function GuidelineCategoryView({ category }: Props) {
             </>
           )}
 
+          {/* Suitable Use Cases - for vitrin */}
+          {guidelineData.suitable_use_cases && (
+            <>
+              <Box>
+                <Typography variant="h6" sx={{ mb: 3, color: 'primary.main' }}>
+                  {guidelineData.suitable_use_cases.title}
+                </Typography>
+                <List>
+                  {guidelineData.suitable_use_cases.items.map((useCase: string, index: number) => (
+                    <ListItem key={index}>
+                      <ListItemText primary={`• ${useCase}`} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+              <Divider />
+            </>
+          )}
+
+          {/* Important Note - for vitrin */}
+          {guidelineData.important_note && (
+            <>
+              <SectionRenderer section={guidelineData.important_note} />
+              <Divider />
+            </>
+          )}
+
+          {/* Comparison - for vitrine and wall_mounted */}
+          {guidelineData.comparison && (
+            <>
+              <Box>
+                <Typography variant="h6" sx={{ mb: 3, color: 'primary.main' }}>
+                  {guidelineData.comparison.title}
+                </Typography>
+                {guidelineData.comparison.subtitle && (
+                  <Typography variant="body1" sx={{ mb: 2, fontStyle: 'italic' }}>
+                    {guidelineData.comparison.subtitle}
+                  </Typography>
+                )}
+                {guidelineData.comparison.sections.map((section: any, index: number) => (
+                  <Box key={index} sx={{ mb: 3 }}>
+                    <SectionRenderer section={section} />
+                  </Box>
+                ))}
+              </Box>
+              <Divider />
+            </>
+          )}
+
           {/* Step by Step Guide */}
           <Box>
             <Typography variant="h5" sx={{ mb: 4, textAlign: 'center', color: 'primary.main' }}>
@@ -649,8 +726,7 @@ export default function GuidelineCategoryView({ category }: Props) {
             </>
           )}
 
-          {/* Additional dynamic sections */}
-          {/* Usage Applications - home appliances */}
+          {/* Usage Applications */}
           {guidelineData.usage_applications && (
             <>
               <Box>
@@ -659,6 +735,23 @@ export default function GuidelineCategoryView({ category }: Props) {
                 </Typography>
                 {guidelineData.usage_applications.sections.map((section: any, index: number) => (
                   <SectionRenderer key={index} section={section} />
+                ))}
+              </Box>
+              <Divider />
+            </>
+          )}
+
+          {/* Usage Guide - for vitrin */}
+          {guidelineData.usage_guide && (
+            <>
+              <Box>
+                <Typography variant="h5" sx={{ mb: 3, color: 'primary.main' }}>
+                  📖 {guidelineData.usage_guide.title}
+                </Typography>
+                {guidelineData.usage_guide.sections.map((section: any, index: number) => (
+                  <Box key={index} sx={{ mb: 3 }}>
+                    <SectionRenderer section={section} />
+                  </Box>
                 ))}
               </Box>
               <Divider />
@@ -714,7 +807,7 @@ export default function GuidelineCategoryView({ category }: Props) {
             </>
           )}
 
-          {/* Other dynamic sections with similar pattern */}
+          {/* Other dynamic sections */}
           {guidelineData.best_practices && (
             <>
               <Box>
@@ -722,6 +815,23 @@ export default function GuidelineCategoryView({ category }: Props) {
                   💡 {guidelineData.best_practices.title}
                 </Typography>
                 {guidelineData.best_practices.sections.map((section: any, index: number) => (
+                  <Box key={index} sx={{ mb: 3 }}>
+                    <SectionRenderer section={section} />
+                  </Box>
+                ))}
+              </Box>
+              <Divider />
+            </>
+          )}
+
+          {/* Marketing Strategy */}
+          {guidelineData.marketing_strategy && (
+            <>
+              <Box>
+                <Typography variant="h5" sx={{ mb: 3, color: 'primary.main' }}>
+                  📊 {guidelineData.marketing_strategy.title}
+                </Typography>
+                {guidelineData.marketing_strategy.sections.map((section: any, index: number) => (
                   <Box key={index} sx={{ mb: 3 }}>
                     <SectionRenderer section={section} />
                   </Box>

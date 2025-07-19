@@ -15,11 +15,11 @@ interface GuidelineSection {
   subsections?: GuidelineSection[];
 }
 
-interface GuidelineBlock {
-  title: string;
-  sections: GuidelineSection[];
-  divider?: boolean;
-}
+// interface GuidelineBlock {
+//   title: string;
+//   sections: GuidelineSection[];
+//   divider?: boolean;
+// }
 
 interface GuidelineService {
   title: string;

@@ -11,12 +11,10 @@ type Props = {
   };
 };
 
-export async function generateMetadata({ params }: Props) {
-  const { category } = params;
-
+export async function generateMetadata() {
   return {
-    title: `راهنمای ${category} | ARmo`,
-    description: `راهنمای کامل استفاده از سرویس ${category} در پلتفرم آرمو`,
+    title: `راهنمای استفاده`,
+    description: `راهنمای کامل استفاده از پلتفرم آرمو`,
   };
 }
 
