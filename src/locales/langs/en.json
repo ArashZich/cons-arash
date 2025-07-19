@@ -1239,7 +1239,13 @@
     "pricing_title_2": "Looking for new features? Share your ideas with us",
     "pricing_description_2": "At Armo, we are constantly expanding our features and services. Your ideas and suggestions can guide us on this path. Share whatever comes to your mind with us.",
     "carpet": "Carpet",
-    "another_category": "Another Categories"
+    "another_category": "Another Categories",
+    "custom_plan_title": "Need a Different Plan?",
+    "custom_plan_subtitle": "Create Your Custom Plan!",
+    "custom_plan_feature_1": "Custom quantity + Custom duration",
+    "custom_plan_feature_2": "For any size requirement",
+    "custom_plan_feature_3": "Up to 70% discount for high volume",
+    "custom_plan_button": "View Custom Plans"
   },
   "errors": {
     "403": "No permission",

@@ -28,6 +28,7 @@ import { PlanData } from 'src/_types/reality/plan/planData';
 //
 import EnterpriseCard from './enterprise-card';
 import PricingCard from './pricing-card';
+import CustomPlanDialog from './custom-plan-dialog';
 
 const HighlightText = styled(Typography)(({ theme }) => ({
   fontWeight: 'bold',
@@ -68,6 +69,7 @@ const PricingForm = () => {
 
   return (
     <Box sx={{ textAlign: 'center' }}>
+      <CustomPlanDialog />
       <Container sx={{ py: 10 }} component={MotionContainer}>
         <Stack alignItems="center" px={5} mt={10}>
           <m.div variants={varFade().inDown}>
