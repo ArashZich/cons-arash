@@ -5,9 +5,13 @@ export const carpet_guideline = {
   subtitle: 'معرفی سرویس واقعیت افزوده فرش',
   description:
     'سرویس واقعیت افزوده فرش، پرمخاطب‌ترین سرویس آرمو است که به کاربران امکان ایجاد تجربه واقعیت افزوده برای فرش‌های خود را می‌دهد',
+
+  // ویژگی منحصر به فرد
   title_feature: 'ویژگی منحصر به فرد آرمو:',
   unique_feature:
     'تنها با آپلود عکس فرش‌ها می‌توانید پروژه واقعیت افزوده بسازید و نیازی به مدلسازی سه‌بعدی ندارید.',
+
+  // قابلیت‌های کلیدی
   title_key_features: 'قابلیت‌های کلیدی سرویس:',
   key_features: [
     { title: 'دسترسی تحت وب:', description: 'بدون نیاز به نصب اپلیکیشن، اجرای مستقیم در مرورگر' },
@@ -17,6 +21,14 @@ export const carpet_guideline = {
       description: 'پشتیبانی از فرش‌های مستطیلی و دایره‌ای با سایز دلخواه',
     },
   ],
+
+  // تفاوت با سایر سرویس‌ها (اختیاری - فقط برای فرش کاربرد ندارد)
+  title_difference: null,
+  differences: null,
+
+  // کاربردهای عملی (اختیاری - فقط برای فرش کاربرد ندارد)
+  title_usecases: null,
+  usecases: null,
 
   title_guideline: 'راهنمای گام به گام ساخت پروژه فرش:',
 
@@ -31,6 +43,18 @@ export const carpet_guideline = {
   // مرحله 2
   header_step_2: 'مرحله 2: انتخاب شکل و سایز فرش',
   title_step_2: 'انتخاب شکل فرش:',
+
+  // نام‌گذاری پروژه (اختیاری - فقط برای رگال)
+  title_step_2_naming: null,
+  step_2_naming_restrictions: null,
+  step_2_naming_rules: null,
+  step_2_naming_examples_title: null,
+  step_2_naming_examples: null,
+  title_step_2_cover: null,
+  step_2_cover_description: null,
+  step_2_cover_options: null,
+  step_2_cover_specs_title: null,
+  step_2_cover_specs: null,
 
   // فرش مستطیلی
   subtitle_step_2_1: 'فرش مستطیلی:',
@@ -65,6 +89,9 @@ export const carpet_guideline = {
 
   // مرحله 3
   header_step_3: 'مرحله 3: نام‌گذاری و آپلود عکس محصولات',
+  title_step_3: null, // برای فرش استفاده نمی‌شود
+
+  // نام‌گذاری
   title_step_3_naming: 'نکته کلیدی نام‌گذاری:',
   step_3_naming: [
     'نام عکس = نام پروژه در سیستم',
@@ -91,6 +118,13 @@ export const carpet_guideline = {
 
   // مرحله 4
   header_step_4: 'مرحله 4: تکمیل پروژه',
+
+  // ظرفیت (اختیاری - فقط برای رگال)
+  title_step_4_capacity: null,
+  step_4_capacity: null,
+  title_step_4_specs: null,
+  step_4_specs: null,
+
   step_4: [
     'روی دکمه "آپلود" کلیک کنید',
     'پس از آپلود موفق، دکمه "ادامه" فعال می‌شود',
@@ -98,6 +132,15 @@ export const carpet_guideline = {
     'صفحه تایید با دو گزینه نمایش داده می‌شود:',
   ],
   step_4_options: ['ایجاد پروژه جدید', 'اطلاعات پروژه'],
+  step_4_image: null, // برای فرش عکس ندارد
+
+  // مرحله 5 (اختیاری - فقط برای رگال)
+  header_step_5: null,
+  title_step_5_upload: null,
+  step_5_upload_method: null,
+  title_step_5_finalize: null,
+  step_5_finalize: null,
+  step_5_options: null,
 
   // مدیریت پروژه‌ها
   title_project_management: 'مدیریت پروژه‌های فرش',
@@ -144,6 +187,35 @@ export const carpet_guideline = {
     },
   ],
   project_edit_image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-carpet-6.webp',
+
+  // نکات بهینه‌سازی (اختیاری - فقط برای رگال)
+  title_optimization: null,
+  header_carpet_selection: null,
+  carpet_selection_tips: null,
+  header_content_organization: null,
+  content_organization_tips: null,
+
+  // مزایای سرویس (اختیاری - فقط برای رگال)
+  title_advantages: null,
+  header_key_differences: null,
+  comparison_table: null,
+  title_unique_experience: null,
+  regal_experience_title: null,
+  regal_experience: null,
+  showroom_experience_title: null,
+  showroom_experience: null,
+  title_business_applications: null,
+  business_applications: null,
+  title_economic_advantages: null,
+  economic_advantages: null,
+  title_performance_comparison: null,
+  header_when_to_use: null,
+  suitable_for_title: null,
+  suitable_for: null,
+  not_suitable_for_title: null,
+  not_suitable_for: null,
+  title_service_selection_guide: null,
+  service_selection_guide: null,
 
   // سرویس‌های پیشرفته
   title_advanced_services: 'سرویس‌های پیشرفته و تکمیلی',
@@ -301,6 +373,9 @@ export const carpet_guideline = {
     url: 'https://armogroup.tech/contact-us/',
     type: 'button',
   },
+
+  // لینک تست نمونه (اختیاری)
+  demo_link: null,
 
   // تصاویر
   images: [
