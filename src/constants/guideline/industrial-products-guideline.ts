@@ -96,7 +96,7 @@ export const industrial_products_guideline = {
           ],
         },
       ],
-      image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industrial-1.webp',
+      image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industry-1.webp',
     },
     {
       header: 'مرحله 2: اطلاعات پروژه',
@@ -132,7 +132,7 @@ export const industrial_products_guideline = {
           ],
         },
       ],
-      image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industrial-2.webp',
+      image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industry-2.webp',
     },
     {
       header: 'مرحله 3: آپلود فایل سه‌بعدی',
@@ -165,7 +165,7 @@ export const industrial_products_guideline = {
             'فایل GLB را با Drag & Drop بکشید یا روی کارت کلیک کرده و فایل مورد نظر را انتخاب کنید.',
         },
       ],
-      image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industrial-3.webp',
+      image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industry-3.webp',
     },
     {
       header: 'مرحله 4: تکمیل پروژه',
@@ -182,7 +182,7 @@ export const industrial_products_guideline = {
           content: ['ایجاد پروژه جدید', 'اطلاعات پروژه'],
         },
       ],
-      image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industrial-4.webp',
+      image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industry-4.webp',
     },
   ] as GuidelineStep[],
 
@@ -202,7 +202,7 @@ export const industrial_products_guideline = {
           'لینک AR (قابل کپی با یک کلیک)',
           'منوی سه نقطه برای دسترسی به گزینه‌های بیشتر',
         ],
-        image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industrial-5.webp',
+        image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industry-5.webp',
       },
       {
         title: 'جزئیات و مدیریت پروژه',
@@ -218,7 +218,7 @@ export const industrial_products_guideline = {
             items: ['تعداد مشاهده', 'مدت زمان بازدید', 'نوع مرورگرهای استفاده شده'],
           },
         ],
-        image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industrial-6.webp',
+        image: 'https://bytebase.armogroup.tech/api/v1/files/public/guideline-industry-6.webp',
       },
       {
         title: 'ویرایش پروژه',

@@ -20,7 +20,6 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Grid from '@mui/material/Grid';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -55,14 +54,14 @@ type Props = {
   category: string;
 };
 
-// Type definitions for dynamic structure
+// Type definitions based on the new structure
 interface GuidelineSection {
   title?: string;
   content?: string | string[];
   type?: 'text' | 'list' | 'warning' | 'info' | 'success' | 'error' | 'chips' | 'table';
   items?: any[];
   subsections?: GuidelineSection[];
-  image?: string;
+  image?: string; // اضافه کردن image property
 }
 
 interface GuidelineStep {
@@ -86,6 +85,42 @@ interface GuidelineService {
 interface GuidelineFAQ {
   question: string;
   answer: string;
+}
+
+interface ComparisonTable {
+  headers: string[];
+  rows: string[][];
+}
+
+// Base guideline interface
+interface BaseGuideline {
+  title: string;
+  subtitle: string;
+  description: string;
+  unique_feature?: GuidelineSection;
+  key_features?: {
+    title: string;
+    items: Array<{
+      title: string;
+      description: string;
+    }>;
+  };
+  steps: GuidelineStep[];
+  project_management?: {
+    title: string;
+    sections: GuidelineSection[];
+  };
+  faq: GuidelineFAQ[];
+  support: {
+    title: string;
+    description: string;
+    contact_button: {
+      text: string;
+      url: string;
+      type: 'button';
+    };
+  };
+  [key: string]: any; // Allow additional properties
 }
 
 // Component for rendering different section types
@@ -124,13 +159,23 @@ const SectionRenderer = ({ section, level = 0 }: { section: GuidelineSection; le
                 key={index}
                 label={item.dimensions ? `${item.name} (${item.dimensions})` : item.name || item}
                 variant="outlined"
+                color="primary"
               />
             ))}
           </Stack>
         );
 
       case 'table':
-        const tableData = section.items as { headers: string[]; rows: string[][] };
+        // Type guard برای بررسی ساختار table
+        if (
+          !section.items ||
+          typeof section.items !== 'object' ||
+          !('headers' in section.items) ||
+          !('rows' in section.items)
+        ) {
+          return null;
+        }
+        const tableData = section.items as ComparisonTable;
         return (
           <TableContainer component={Paper} variant="outlined">
             <Table>
@@ -162,14 +207,22 @@ const SectionRenderer = ({ section, level = 0 }: { section: GuidelineSection; le
       case 'success':
         const colors = {
           warning: { bg: 'warning.lighter', color: 'warning.main', icon: '⚠️' },
-          error: { bg: 'error.lighter', color: 'error.main', icon: '⚠️' },
+          error: { bg: 'error.lighter', color: 'error.main', icon: '🚫' },
           info: { bg: 'info.lighter', color: 'info.main', icon: '💡' },
-          success: { bg: 'success.lighter', color: 'success.main', icon: '📊' },
+          success: { bg: 'success.lighter', color: 'success.main', icon: '✅' },
         };
         const colorConfig = colors[section.type];
 
         return (
-          <Box sx={{ bgcolor: colorConfig.bg, p: 2, borderRadius: 1 }}>
+          <Box
+            sx={{
+              bgcolor: colorConfig.bg,
+              p: 3,
+              borderRadius: 2,
+              border: 1,
+              borderColor: 'divider',
+            }}
+          >
             {section.title && (
               <Typography
                 variant="subtitle1"
@@ -267,14 +320,6 @@ const SectionRenderer = ({ section, level = 0 }: { section: GuidelineSection; le
           ))}
         </Stack>
       )}
-
-      {section.image && (
-        <Image
-          src={section.image}
-          alt={section.title || 'تصویر راهنما'}
-          sx={{ width: '100%', borderRadius: 1, border: 1, borderColor: 'divider' }}
-        />
-      )}
     </Stack>
   );
 };
@@ -288,7 +333,7 @@ const ServiceRenderer = ({ service }: { service: GuidelineService }) => {
   };
 
   return (
-    <Card sx={{ mb: 3, bgcolor: 'primary.lighter' }}>
+    <Card sx={{ mb: 3, bgcolor: 'primary.lighter', border: 1, borderColor: 'primary.light' }}>
       <CardContent>
         <Typography variant="h6" sx={{ mb: 2, color: 'primary.main' }}>
           {service.title}
@@ -309,7 +354,7 @@ const ServiceRenderer = ({ service }: { service: GuidelineService }) => {
         )}
 
         {service.links && (
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={2} flexWrap="wrap">
             {service.links.map((link, index) => (
               <Button
                 key={index}
@@ -328,23 +373,53 @@ const ServiceRenderer = ({ service }: { service: GuidelineService }) => {
   );
 };
 
+// Component for key features
+const KeyFeaturesRenderer = ({ keyFeatures }: { keyFeatures: any }) => {
+  return (
+    <Box>
+      <Typography variant="h6" sx={{ mb: 3, color: 'primary.main' }}>
+        {keyFeatures.title}
+      </Typography>
+      <Stack spacing={2}>
+        {keyFeatures.items.map((feature: any, index: number) => (
+          <Card
+            key={index}
+            variant="outlined"
+            sx={{ transition: 'all 0.2s', '&:hover': { boxShadow: 2 } }}
+          >
+            <CardContent>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
+              >
+                {feature.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {feature.description}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))}
+      </Stack>
+    </Box>
+  );
+};
+
 export default function GuidelineCategoryView({ category }: Props) {
   const settings = useSettingsContext();
   const router = useRouter();
   const { t } = useLocales();
 
-  const guidelineData = useMemo(() => {
+  const guidelineData: BaseGuideline | null = useMemo(() => {
     switch (category) {
       case 'carpet':
-        return carpet_guideline;
+        return carpet_guideline as BaseGuideline;
       case 'regal':
-        return regal_guideline;
-      case 'industrial':
-      case 'industrial-products':
-        return industrial_products_guideline;
-      case 'home-appliances':
+        return regal_guideline as BaseGuideline;
+      case 'industrial_products':
+        return industrial_products_guideline as BaseGuideline;
       case 'home_appliances':
-        return home_appliances_guideline;
+        return home_appliances_guideline as BaseGuideline;
       default:
         return null;
     }
@@ -391,31 +466,34 @@ export default function GuidelineCategoryView({ category }: Props) {
       />
 
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" color="primary" sx={{ mb: 2 }}>
+      <Box sx={{ mb: 4, textAlign: 'center' }}>
+        <Typography variant="h4" color="primary" sx={{ mb: 2 }}>
           {guidelineData.subtitle}
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ mb: 3, maxWidth: 800, mx: 'auto' }}
+        >
           {guidelineData.description}
         </Typography>
 
         {/* Contact Us Button */}
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            size="large"
-            onClick={() => handleLinkClick(guidelineData.support.contact_button.url)}
-            startIcon={<Iconify icon="eva:phone-fill" />}
-          >
-            {guidelineData.support.contact_button.text}
-          </Button>
-        </Box>
+        <Button
+          variant="contained"
+          color="secondary"
+          size="large"
+          onClick={() => handleLinkClick(guidelineData.support.contact_button.url)}
+          startIcon={<Iconify icon="eva:phone-fill" />}
+          sx={{ px: 4, py: 1.5 }}
+        >
+          {guidelineData.support.contact_button.text}
+        </Button>
       </Box>
 
       {/* Content */}
-      <Paper sx={{ p: 4 }}>
-        <Stack spacing={4}>
+      <Paper sx={{ p: 4, borderRadius: 2 }}>
+        <Stack spacing={5}>
           {/* Unique Feature */}
           {guidelineData.unique_feature && (
             <>
@@ -427,25 +505,7 @@ export default function GuidelineCategoryView({ category }: Props) {
           {/* Key Features */}
           {guidelineData.key_features && (
             <>
-              <Box>
-                <Typography variant="h6" sx={{ mb: 2 }}>
-                  {guidelineData.key_features.title}
-                </Typography>
-                <Stack spacing={2}>
-                  {guidelineData.key_features.items.map((feature, index) => (
-                    <Card key={index} variant="outlined">
-                      <CardContent>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                          {feature.title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {feature.description}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </Stack>
-              </Box>
+              <KeyFeaturesRenderer keyFeatures={guidelineData.key_features} />
               <Divider />
             </>
           )}
@@ -454,11 +514,11 @@ export default function GuidelineCategoryView({ category }: Props) {
           {guidelineData.differences && (
             <>
               <Box>
-                <Typography variant="h6" sx={{ mb: 2 }}>
+                <Typography variant="h6" sx={{ mb: 3, color: 'primary.main' }}>
                   {guidelineData.differences.title}
                 </Typography>
                 <Stack spacing={2}>
-                  {guidelineData.differences.items.map((diff, index) => (
+                  {guidelineData.differences.items.map((diff: any, index: number) => (
                     <Card key={index} variant="outlined">
                       <CardContent>
                         <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
@@ -480,11 +540,11 @@ export default function GuidelineCategoryView({ category }: Props) {
           {guidelineData.use_cases && (
             <>
               <Box>
-                <Typography variant="h6" sx={{ mb: 2 }}>
+                <Typography variant="h6" sx={{ mb: 3, color: 'primary.main' }}>
                   {guidelineData.use_cases.title}
                 </Typography>
                 <List>
-                  {guidelineData.use_cases.items.map((usecase, index) => (
+                  {guidelineData.use_cases.items.map((usecase: string, index: number) => (
                     <ListItem key={index}>
                       <ListItemText primary={`• ${usecase}`} />
                     </ListItem>
@@ -499,11 +559,11 @@ export default function GuidelineCategoryView({ category }: Props) {
           {guidelineData.suitable_products && (
             <>
               <Box>
-                <Typography variant="h6" sx={{ mb: 2 }}>
+                <Typography variant="h6" sx={{ mb: 3, color: 'primary.main' }}>
                   {guidelineData.suitable_products.title}
                 </Typography>
                 <List>
-                  {guidelineData.suitable_products.items.map((product, index) => (
+                  {guidelineData.suitable_products.items.map((product: string, index: number) => (
                     <ListItem key={index}>
                       <ListItemText primary={`• ${product}`} />
                     </ListItem>
@@ -516,31 +576,44 @@ export default function GuidelineCategoryView({ category }: Props) {
 
           {/* Step by Step Guide */}
           <Box>
-            <Typography variant="h5" sx={{ mb: 3, textAlign: 'center' }}>
-              راهنمای گام به گام
+            <Typography variant="h5" sx={{ mb: 4, textAlign: 'center', color: 'primary.main' }}>
+              📋 راهنمای گام به گام
             </Typography>
 
-            {guidelineData.steps.map((step: GuidelineStep, index: number) => (
-              <Accordion key={index}>
-                <AccordionSummary expandIcon={<Iconify icon="eva:arrow-down-fill" />}>
-                  <Typography variant="h6">{step.header}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Stack spacing={3}>
-                    {step.sections.map((section, sectionIndex) => (
-                      <SectionRenderer key={sectionIndex} section={section} />
-                    ))}
-                    {step.image && (
-                      <Image
-                        src={step.image}
-                        alt={step.header}
-                        sx={{ width: '100%', borderRadius: 1, border: 1, borderColor: 'divider' }}
-                      />
-                    )}
-                  </Stack>
-                </AccordionDetails>
-              </Accordion>
-            ))}
+            <Stack spacing={2}>
+              {guidelineData.steps.map((step: GuidelineStep, index: number) => (
+                <Accordion key={index} defaultExpanded={index === 0}>
+                  <AccordionSummary
+                    expandIcon={<Iconify icon="eva:arrow-down-fill" />}
+                    sx={{ bgcolor: 'grey.50' }}
+                  >
+                    <Typography variant="h6" color="primary.main">
+                      {step.header}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Stack spacing={3}>
+                      {step.sections.map((section, sectionIndex) => (
+                        <SectionRenderer key={sectionIndex} section={section} />
+                      ))}
+                      {step.image && (
+                        <Image
+                          src={step.image}
+                          alt={step.header}
+                          sx={{
+                            width: '100%',
+                            borderRadius: 2,
+                            border: 2,
+                            borderColor: 'divider',
+                            boxShadow: 2,
+                          }}
+                        />
+                      )}
+                    </Stack>
+                  </AccordionDetails>
+                </Accordion>
+              ))}
+            </Stack>
           </Box>
 
           <Divider />
@@ -549,12 +622,26 @@ export default function GuidelineCategoryView({ category }: Props) {
           {guidelineData.project_management && (
             <>
               <Box>
-                <Typography variant="h5" sx={{ mb: 3 }}>
-                  {guidelineData.project_management.title}
+                <Typography variant="h5" sx={{ mb: 4, color: 'primary.main' }}>
+                  🗂️ {guidelineData.project_management.title}
                 </Typography>
                 {guidelineData.project_management.sections.map((section, index) => (
-                  <Box key={index} sx={{ mb: 3 }}>
+                  <Box key={index} sx={{ mb: 4 }}>
                     <SectionRenderer section={section} />
+                    {section.image && (
+                      <Image
+                        src={section.image}
+                        alt={section.title || 'تصویر مدیریت پروژه'}
+                        sx={{
+                          width: '100%',
+                          borderRadius: 2,
+                          border: 2,
+                          borderColor: 'divider',
+                          boxShadow: 2,
+                          mt: 2,
+                        }}
+                      />
+                    )}
                   </Box>
                 ))}
               </Box>
@@ -562,28 +649,15 @@ export default function GuidelineCategoryView({ category }: Props) {
             </>
           )}
 
-          {/* Contact Button After Project Management */}
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <Button
-              variant="contained"
-              color="secondary"
-              size="large"
-              onClick={() => handleLinkClick(guidelineData.support.contact_button.url)}
-              startIcon={<Iconify icon="eva:phone-fill" />}
-            >
-              {guidelineData.support.contact_button.text}
-            </Button>
-          </Box>
-
           {/* Additional dynamic sections */}
           {/* Usage Applications - home appliances */}
           {guidelineData.usage_applications && (
             <>
               <Box>
-                <Typography variant="h5" sx={{ mb: 3 }}>
-                  {guidelineData.usage_applications.title}
+                <Typography variant="h5" sx={{ mb: 3, color: 'primary.main' }}>
+                  🎯 {guidelineData.usage_applications.title}
                 </Typography>
-                {guidelineData.usage_applications.sections.map((section, index) => (
+                {guidelineData.usage_applications.sections.map((section: any, index: number) => (
                   <SectionRenderer key={index} section={section} />
                 ))}
               </Box>
@@ -595,10 +669,10 @@ export default function GuidelineCategoryView({ category }: Props) {
           {guidelineData.file_solutions && (
             <>
               <Box>
-                <Typography variant="h5" sx={{ mb: 3 }}>
+                <Typography variant="h5" sx={{ mb: 3, color: 'primary.main' }}>
                   {guidelineData.file_solutions.title}
                 </Typography>
-                {guidelineData.file_solutions.sections.map((section, index) => (
+                {guidelineData.file_solutions.sections.map((section: any, index: number) => (
                   <Box key={index} sx={{ mb: 3 }}>
                     <SectionRenderer section={section} />
                   </Box>
@@ -612,10 +686,10 @@ export default function GuidelineCategoryView({ category }: Props) {
           {guidelineData.related_services && (
             <>
               <Box>
-                <Typography variant="h5" sx={{ mb: 3, textAlign: 'center' }}>
-                  سرویس‌های مرتبط
+                <Typography variant="h5" sx={{ mb: 4, textAlign: 'center', color: 'primary.main' }}>
+                  🔗 سرویس‌های مرتبط
                 </Typography>
-                {guidelineData.related_services.map((service, index) => (
+                {guidelineData.related_services.map((service: GuidelineService, index: number) => (
                   <ServiceRenderer key={index} service={service} />
                 ))}
               </Box>
@@ -627,134 +701,29 @@ export default function GuidelineCategoryView({ category }: Props) {
           {guidelineData.additional_services && (
             <>
               <Box>
-                <Typography variant="h5" sx={{ mb: 3, textAlign: 'center' }}>
+                <Typography variant="h5" sx={{ mb: 4, textAlign: 'center', color: 'primary.main' }}>
                   🤖 سرویس‌های پیشرفته و تکمیلی
                 </Typography>
-                {guidelineData.additional_services.map((service, index) => (
-                  <ServiceRenderer key={index} service={service} />
-                ))}
+                {guidelineData.additional_services.map(
+                  (service: GuidelineService, index: number) => (
+                    <ServiceRenderer key={index} service={service} />
+                  )
+                )}
               </Box>
               <Divider />
             </>
           )}
 
-          {/* Best Practices */}
+          {/* Other dynamic sections with similar pattern */}
           {guidelineData.best_practices && (
             <>
               <Box>
-                <Typography variant="h5" sx={{ mb: 3 }}>
-                  {guidelineData.best_practices.title}
+                <Typography variant="h5" sx={{ mb: 3, color: 'primary.main' }}>
+                  💡 {guidelineData.best_practices.title}
                 </Typography>
-                {guidelineData.best_practices.sections.map((section, index) => (
+                {guidelineData.best_practices.sections.map((section: any, index: number) => (
                   <Box key={index} sx={{ mb: 3 }}>
                     <SectionRenderer section={section} />
-                  </Box>
-                ))}
-              </Box>
-              <Divider />
-            </>
-          )}
-
-          {/* Marketing Strategy */}
-          {guidelineData.marketing_strategy && (
-            <>
-              <Box>
-                <Typography variant="h5" sx={{ mb: 3 }}>
-                  {guidelineData.marketing_strategy.title}
-                </Typography>
-                {guidelineData.marketing_strategy.sections.map((section, index) => (
-                  <Box key={index} sx={{ mb: 3 }}>
-                    <SectionRenderer section={section} />
-                  </Box>
-                ))}
-              </Box>
-              <Divider />
-            </>
-          )}
-
-          {/* Optimization - for regal */}
-          {guidelineData.optimization && (
-            <>
-              <Box>
-                <Typography variant="h5" sx={{ mb: 3 }}>
-                  {guidelineData.optimization.title}
-                </Typography>
-                {guidelineData.optimization.sections.map((section, index) => (
-                  <Box key={index} sx={{ mb: 3 }}>
-                    <SectionRenderer section={section} />
-                  </Box>
-                ))}
-              </Box>
-              <Divider />
-            </>
-          )}
-
-          {/* Advantages - for regal */}
-          {guidelineData.advantages && (
-            <>
-              <Box>
-                <Typography variant="h5" sx={{ mb: 3 }}>
-                  {guidelineData.advantages.title}
-                </Typography>
-                {guidelineData.advantages.sections.map((section, index) => (
-                  <Box key={index} sx={{ mb: 3 }}>
-                    <SectionRenderer section={section} />
-                  </Box>
-                ))}
-              </Box>
-              <Divider />
-            </>
-          )}
-
-          {/* Performance Comparison - for regal */}
-          {guidelineData.performance_comparison && (
-            <>
-              <Box>
-                <Typography variant="h5" sx={{ mb: 3 }}>
-                  {guidelineData.performance_comparison.title}
-                </Typography>
-                {guidelineData.performance_comparison.sections.map((section, index) => (
-                  <Box key={index} sx={{ mb: 3 }}>
-                    <SectionRenderer section={section} />
-                    {/* Special handling for service selection guide */}
-                    {section.items &&
-                      Array.isArray(section.items) &&
-                      section.items[0]?.scenario && (
-                        <Stack spacing={2} sx={{ mt: 2 }}>
-                          {section.items.map((guide, guideIndex) => (
-                            <Card
-                              key={guideIndex}
-                              variant="outlined"
-                              sx={{
-                                cursor: guide.link ? 'pointer' : 'default',
-                                transition: 'all 0.2s ease',
-                                '&:hover': guide.link
-                                  ? {
-                                      boxShadow: (theme) => theme.shadows[4],
-                                      transform: 'translateY(-2px)',
-                                    }
-                                  : {},
-                              }}
-                              onClick={() => guide.link && handleLinkClick(guide.link)}
-                            >
-                              <CardContent>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                  {guide.scenario}
-                                </Typography>
-                                <Stack direction="row" alignItems="center" spacing={1}>
-                                  <Typography
-                                    variant="body2"
-                                    color="primary.main"
-                                    sx={{ fontWeight: 'medium' }}
-                                  >
-                                    {guide.recommendation}
-                                  </Typography>
-                                </Stack>
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </Stack>
-                      )}
                   </Box>
                 ))}
               </Box>
@@ -768,6 +737,7 @@ export default function GuidelineCategoryView({ category }: Props) {
               <Box sx={{ textAlign: 'center', mb: 3 }}>
                 <Button
                   variant="contained"
+                  color="primary"
                   size="large"
                   onClick={() => handleLinkClick(guidelineData.demo_link.url)}
                   startIcon={<Iconify icon="eva:external-link-fill" />}
@@ -782,13 +752,16 @@ export default function GuidelineCategoryView({ category }: Props) {
 
           {/* FAQ */}
           <Box>
-            <Typography variant="h5" sx={{ mb: 3 }}>
-              سوالات متداول
+            <Typography variant="h5" sx={{ mb: 4, color: 'primary.main' }}>
+              ❓ سوالات متداول
             </Typography>
             <Stack spacing={2}>
               {guidelineData.faq.map((faq: GuidelineFAQ, index: number) => (
                 <Accordion key={index}>
-                  <AccordionSummary expandIcon={<Iconify icon="eva:arrow-down-fill" />}>
+                  <AccordionSummary
+                    expandIcon={<Iconify icon="eva:arrow-down-fill" />}
+                    sx={{ bgcolor: 'grey.50' }}
+                  >
                     <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
                       {faq.question}
                     </Typography>
@@ -805,23 +778,22 @@ export default function GuidelineCategoryView({ category }: Props) {
 
           {/* Support */}
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              {guidelineData.support.title}
+            <Typography variant="h5" sx={{ mb: 2, color: 'primary.main' }}>
+              📞 {guidelineData.support.title}
             </Typography>
-            <Typography variant="body1" sx={{ mb: 3 }}>
+            <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
               {guidelineData.support.description}
             </Typography>
-            <Box sx={{ textAlign: 'center', mb: 3 }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                size="large"
-                onClick={() => handleLinkClick(guidelineData.support.contact_button.url)}
-                startIcon={<Iconify icon="eva:phone-fill" />}
-              >
-                {guidelineData.support.contact_button.text}
-              </Button>
-            </Box>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="large"
+              onClick={() => handleLinkClick(guidelineData.support.contact_button.url)}
+              startIcon={<Iconify icon="eva:phone-fill" />}
+              sx={{ px: 4, py: 1.5 }}
+            >
+              {guidelineData.support.contact_button.text}
+            </Button>
           </Box>
         </Stack>
       </Paper>
