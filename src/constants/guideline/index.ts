@@ -2,3 +2,4 @@
 
 export * from './carpet-guideline';
 export * from './regal-guideline';
+export * from './industrial-products-guideline';

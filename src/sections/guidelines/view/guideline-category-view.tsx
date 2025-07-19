@@ -42,7 +42,7 @@ import Image from 'src/components/image';
 import { useLocales } from 'src/locales';
 
 // constants
-import { carpet_guideline, regal_guideline } from 'src/constants';
+import { carpet_guideline, regal_guideline, industrial_products_guideline } from 'src/constants';
 
 // ----------------------------------------------------------------------
 
@@ -61,6 +61,8 @@ export default function GuidelineCategoryView({ category }: Props) {
         return carpet_guideline;
       case 'regal':
         return regal_guideline;
+      case 'industrial_products':
+        return industrial_products_guideline;
       default:
         return null;
     }
