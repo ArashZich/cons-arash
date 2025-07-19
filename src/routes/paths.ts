@@ -10,6 +10,7 @@ const ROOTS = {
   POST: '/post',
   BLOG: '/blog',
   IDENTITY_VERIFICATION: '/identity-verification',
+  GUIDELINE: '/guidelines',
 };
 
 // ----------------------------------------------------------------------
@@ -132,5 +133,10 @@ export const paths = {
   },
   identity_verification: {
     root: ROOTS.IDENTITY_VERIFICATION,
+  },
+
+  guideline: {
+    root: ROOTS.GUIDELINE,
+    category: (category: string) => `${ROOTS.GUIDELINE}/${category}`,
   },
 };

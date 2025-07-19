@@ -72,7 +72,7 @@ export default function PostListHomeView() {
   const pageCount = Math.ceil(totalItems / perPage);
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'lg'} sx={{ pb: 10 }}>
+    <Container maxWidth={settings.themeStretch ? false : 'lg'} sx={{ py: 10 }}>
       <Typography
         variant="h4"
         sx={{

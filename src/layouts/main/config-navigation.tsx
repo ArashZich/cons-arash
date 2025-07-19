@@ -117,7 +117,7 @@ export const navConfigMenu = (t: Function): NavItemProps[] => [
     path: '/contact-us',
   },
   {
-    title: t('landing.faq'),
-    path: '/faq',
+    title: t('landing.guidelines'),
+    path: '/guidelines',
   },
 ];

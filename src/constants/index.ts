@@ -13,3 +13,4 @@ export * from './makeup';
 export * from './landing-3d-modeling';
 export * from './digital-space-design';
 export * from './eyewear';
+export * from './guideline'; // این خط جدید اضافه شد
